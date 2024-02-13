@@ -10,8 +10,8 @@ Welcome to the official repository for the Sensorial System's Stable Diffusion p
 
 ## Prerequisites
 
-Before you begin, ensure you have a working `kohya_ss` environment.
-This is needed for now as `kohya_ss` is used as our backend. Our goal is to implement the trainer in Rust in the future.
+Before you begin, ensure you have a working `kohya_ss` environment. This is needed for now as `kohya_ss` is used as our backend. Our goal is to implement the trainer in Rust in the future.
+Check [https://github.com/bmaltais/kohya_ss](https://github.com/bmaltais/kohya_ss).
 
 ## Stable Diffusion CLI
 
