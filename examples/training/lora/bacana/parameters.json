@@ -1,0 +1,23 @@
+{
+    "prompt": {
+        "instance": "bacana",
+        "class": "white dog"
+    },
+    "dataset": {
+        "training": "images"
+    },
+    "network": {
+        "dimension": 8,
+        "alpha": 1.0
+    },
+    "output": {
+        "name": "{prompt.instance}({prompt.class})d{network.dimension}a{network.alpha}",
+        "directory": "./output"
+    },
+    "training": {
+        "optimizer": "Adafactor",
+        "learning_rate": {
+            "scheduler": "Constant"
+        }    
+    }
+}
