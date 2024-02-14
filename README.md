@@ -1,11 +1,12 @@
-# Stable Diffusion
+[![](https://dcbadge.vercel.app/api/server/rzaesS82MT)](https://discord.gg/rzaesS82MT)
 
-Welcome to the official codebase for the Sensorial System's Stable Diffusion projects. For now, this only hosts the codebase for our Stable Diffusion trainer, designed to make it easier to automate all the steps of finetuning Stable Diffusion models.
+# Stable Diffusion XL LoRA Trainer
+
+Welcome to the official codebase for the Sensorial System's Stable Diffusion projects. For now, this only hosts the codebase for our Stable Diffusion XL LoRA Trainer, designed to make it easier to automate all the steps of finetuning Stable Diffusion models.
 
 ## Features
 
-- **Stable Diffusion LoRA training**: An automatable trainer for Stable Diffusion LoRA.
-- **Rust Library**: The trainer is available as a Rust library.
+- **Stable Diffusion XL LoRA Trainer**: An automatable trainer for Stable Diffusion XL LoRA.
 - **Command Line Interface (CLI)**: For ease of use, the trainer can be accessed via a CLI, making it accessible for various use cases.
 
 ## Requirements
