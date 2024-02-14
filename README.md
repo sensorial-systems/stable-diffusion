@@ -8,10 +8,9 @@ Welcome to the official repository for the Sensorial System's Stable Diffusion p
 - **Rust Library**: The trainer is available as a Rust library.
 - **Command Line Interface (CLI)**: For ease of use, the trainer can be accessed via a CLI, making it accessible for various use cases.
 
-## Prerequisites
+## Requirements
 
-Before you begin, ensure you have a working `kohya_ss` environment. This is needed for now as `kohya_ss` is used as our backend. Our goal is to implement the trainer in Rust in the future.
-Check [https://github.com/bmaltais/kohya_ss](https://github.com/bmaltais/kohya_ss).
+- **kohya_ss**: Follow the installation guidelines here [https://github.com/bmaltais/kohya_ss](https://github.com/bmaltais/kohya_ss).
 
 ## Stable Diffusion CLI
 
@@ -101,7 +100,7 @@ Some of the generated images:
 <img src="examples/training/lora/bacana/generation/bacana as an astronaut.png" width="128" />
 </p>
 
-## Development guidelines
+## Development tips
 
 ### Debugging
 
