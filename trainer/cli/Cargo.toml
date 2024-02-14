@@ -12,6 +12,6 @@ readme.workspace = true
 keywords.workspace = true
 
 [dependencies]
-stable-diffusion-trainer = { path = "../lib" }
+stable-diffusion-trainer.workspace = true
 clap = { version = "4", features = ["derive"] }
 rfd = "0.13"
