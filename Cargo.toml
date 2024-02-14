@@ -1,3 +1,14 @@
+[workspace.package]
+version = "0.1.0"
+description = "Stable Diffusion kohya_ss wrapper"
+license = "Apache-2.0"
+documentation = "https://docs.rs/stable-diffusion-trainer"
+repository = "https://github.com/sensorial-systems/stable-diffusion"
+homepage = "https://github.com/sensorial-systems/stable-diffusion"
+edition = "2021"
+authors = ["Danilo Guanabara <danilo@sensorial.systems>"]
+keywords = ["stable-diffusion", "generative-ai", "trainer"]
+
 [workspace]
 resolver = "2"
 members = [

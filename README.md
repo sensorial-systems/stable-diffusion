@@ -1,6 +1,6 @@
 # Stable Diffusion
 
-Welcome to the official repository for the Sensorial System's Stable Diffusion projects. For now, this repository only hosts the codebase for our Stable Diffusion trainer, designed to make it easier to automate all the steps of finetuning Stable Diffusion models.
+Welcome to the official codebase for the Sensorial System's Stable Diffusion projects. For now, this only hosts the codebase for our Stable Diffusion trainer, designed to make it easier to automate all the steps of finetuning Stable Diffusion models.
 
 ## Features
 
@@ -35,9 +35,9 @@ We have a [dataset with photos of Bacana](examples/training/lora/bacana/images),
 
 Some of the training images in [examples/training/lora/bacana/images](examples/training/lora/bacana/images):
 <p>
-<img src="examples/training/lora/bacana/images/IMG_5175.PNG" width="128">
-<img src="examples/training/lora/bacana/images/IMG_5176.PNG" width="128">
-<img src="examples/training/lora/bacana/images/IMG_5180.PNG" width="128">
+<img src="https://github.com/sensorial-systems/stable-diffusion/blob/main/examples/training/lora/bacana/images/IMG_5175.PNG" width="128">
+<img src="https://github.com/sensorial-systems/stable-diffusion/blob/main/examples/training/lora/bacana/images/IMG_5176.PNG" width="128">
+<img src="https://github.com/sensorial-systems/stable-diffusion/blob/main/examples/training/lora/bacana/images/IMG_5180.PNG" width="128">
 </p>
 
 The training parameters looks like this:
@@ -95,9 +95,9 @@ to test image generation with the LoRA model. The generated images will be prese
 
 Some of the generated images:
 <p>
-<img src="examples/training/lora/bacana/generation/bacana as a fireman.png" width="128" />
-<img src="examples/training/lora/bacana/generation/bacana as a scientist.png" width="128" />
-<img src="examples/training/lora/bacana/generation/bacana as an astronaut.png" width="128" />
+<img src="https://github.com/sensorial-systems/stable-diffusion/blob/main/examples/training/lora/bacana/generation/bacana as a fireman.png" width="128" />
+<img src="https://github.com/sensorial-systems/stable-diffusion/blob/main/examples/training/lora/bacana/generation/bacana as a scientist.png" width="128" />
+<img src="https://github.com/sensorial-systems/stable-diffusion/blob/main/examples/training/lora/bacana/generation/bacana as an astronaut.png" width="128" />
 </p>
 
 ## Development tips
