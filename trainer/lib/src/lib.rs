@@ -36,9 +36,9 @@
 //! 
 //! Some of the training images in [examples/training/lora/bacana/images](examples/training/lora/bacana/images):
 //! <p>
-//! <img src="https://github.com/sensorial-systems/stable-diffusion/blob/main/examples/training/lora/bacana/images/IMG_5175.PNG" width="128">
-//! <img src="https://github.com/sensorial-systems/stable-diffusion/blob/main/examples/training/lora/bacana/images/IMG_5176.PNG" width="128">
-//! <img src="https://github.com/sensorial-systems/stable-diffusion/blob/main/examples/training/lora/bacana/images/IMG_5180.PNG" width="128">
+//! <img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/images/IMG_5175.PNG" width="128">
+//! <img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/images/IMG_5176.PNG" width="128">
+//! <img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/images/IMG_5180.PNG" width="128">
 //! </p>
 //! 
 //! The training parameters looks like this:
@@ -96,9 +96,9 @@
 //! 
 //! Some of the generated images:
 //! <p>
-//! <img src="https://github.com/sensorial-systems/stable-diffusion/blob/main/examples/training/lora/bacana/generation/bacana as a fireman.png" width="128" />
-//! <img src="https://github.com/sensorial-systems/stable-diffusion/blob/main/examples/training/lora/bacana/generation/bacana as a scientist.png" width="128" />
-//! <img src="https://github.com/sensorial-systems/stable-diffusion/blob/main/examples/training/lora/bacana/generation/bacana as an astronaut.png" width="128" />
+//! <img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/generation/bacana as a fireman.png" width="128" />
+//! <img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/generation/bacana as a scientist.png" width="128" />
+//! <img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/generation/bacana as an astronaut.png" width="128" />
 //! </p>
 //! 
 //! ## Development tips
