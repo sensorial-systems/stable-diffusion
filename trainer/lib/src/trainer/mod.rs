@@ -96,6 +96,12 @@ impl Trainer {
         Default::default()
     }
 
+    /// Set the environment for the training process.
+    pub fn with_environment(mut self, environment: Environment) -> Self {
+        self.environment = environment;
+        self
+    }
+
     fn training_dir() -> PathBuf {
         if let Some(path) = std::env::var_os("TRAINING_DIR") {
             PathBuf::from(path)
@@ -105,12 +111,13 @@ impl Trainer {
     }
 
     /// Start the training process.
-    pub fn start(&self, parameters: &Parameters) {
+    pub fn start(&mut self, parameters: &Parameters) {
         let training_dir = Self::training_dir();
-        self.activate();
         self.prepare(parameters, &training_dir);
+        self.activate();
         self.caption(parameters, &training_dir);
         self.train(parameters, &training_dir);
+        self.deactivate();
     }
 
     fn image_dir(training_dir: &PathBuf) -> PathBuf {
@@ -125,8 +132,12 @@ impl Trainer {
         Self::image_dir(training_dir).join(format!("{}_{} {}", self.training_images_repeat, parameters.prompt.instance, parameters.prompt.class))
     }
 
-    fn activate(&self) {
+    fn activate(&mut self) {
         self.environment.activate();
+    }
+
+    fn deactivate(&mut self) {
+        self.environment.deactivate();
     }
 
     fn prepare(&self, parameters: &Parameters, training_dir: &PathBuf) {

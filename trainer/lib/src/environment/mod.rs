@@ -7,7 +7,8 @@ use serde::{Serialize, Deserialize};
 /// The environment structure.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Environment {
-    kohya_ss: PathBuf
+    kohya_ss: PathBuf,
+    previous_dir: PathBuf
 }
 
 impl Default for Environment {
@@ -26,7 +27,8 @@ impl Environment {
             .and_then(|config| serde_json::from_str::<Environment>(&config).ok())
             .map(|env| env.kohya_ss().to_path_buf())
             .unwrap_or_default();
-        Environment { kohya_ss }
+        let previous_dir = Default::default();
+        Environment { kohya_ss, previous_dir }
     }
 
     /// Save the environment to the configuration file.
@@ -47,8 +49,8 @@ impl Environment {
     }
 
     /// Set the kohya_ss path.
-    pub fn with_kohya_ss(mut self, kohya_ss: PathBuf) -> Self {
-        self.kohya_ss = kohya_ss;
+    pub fn with_kohya_ss(mut self, kohya_ss: impl Into<PathBuf>) -> Self {
+        self.kohya_ss = kohya_ss.into();
         self
     }
 
@@ -75,14 +77,20 @@ impl Environment {
         python_executable
     }
 
-    /// Get the kohya_ss path.
-    pub fn activate(&self) {
+    /// Activate the environment.
+    pub fn activate(&mut self) {
         std::env::set_var("PYTHONPATH", self.kohya_ss.join("venv").join("Lib").join("site-packages"));
         #[cfg(target_os = "windows")]
         std::env::set_var("PATH", format!("{};{}", std::env::var("PATH").unwrap(), self.binary_path().display()));
         #[cfg(not(target_os = "windows"))]
         std::env::set_var("PATH", format!("{}:{}", std::env::var("PATH").unwrap(), self.binary_path().display()));
         // FIXME: This is too invasive. It should be done in a more controlled way.
+        self.previous_dir = std::env::current_dir().unwrap();
         std::env::set_current_dir(&self.kohya_ss).unwrap();
+    }
+
+    /// Deactivate the environment.
+    pub fn deactivate(&mut self) {
+        std::env::set_current_dir(&self.previous_dir).unwrap();
     }
 }
