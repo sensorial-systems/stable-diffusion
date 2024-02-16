@@ -13,6 +13,8 @@ Welcome to the official codebase for the Sensorial System's Stable Diffusion pro
 
 - **kohya_ss**: Follow the installation guidelines here [https://github.com/bmaltais/kohya_ss](https://github.com/bmaltais/kohya_ss).
 
+## Examples
+
 We have a [dataset with photos of Bacana](examples/training/lora/bacana/images), a Coton de Tuléar, conceptualized as `bacana white dog` to not mix with the existing `Coton de Tuléar` concept in the `Stable Diffusion XL` model.
 
 It's organized as follows:
