@@ -70,9 +70,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             setup.setup();
         },
         Command::Train(train) => {
-            let parameters = Parameters::from_file(train.config)?;            
-            let trainer = Trainer::new();
-            trainer.start(&parameters);
+            let parameters = Parameters::from_file(train.config)?;
+            Trainer::new().start(&parameters);
         }
     }
     Ok(())

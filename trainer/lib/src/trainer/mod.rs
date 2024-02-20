@@ -24,8 +24,6 @@ pub struct Trainer {
     pub training_images_repeat: usize,
     /// The number of times to repeat the regularization images.
     pub regularization_images_repeat: usize,
-    /// The name or path of the pretrained model to use for the training process.
-    pub pretrained_model_name_or_path: String,
     /// The maximum resolution of the images to use for the training process.
     pub resolution: (usize, usize),
     /// The format to save the model as.
@@ -68,7 +66,6 @@ impl Default for Trainer {
             environment: Default::default(),
             training_images_repeat: 40,
             regularization_images_repeat: 1,
-            pretrained_model_name_or_path: "stabilityai/stable-diffusion-xl-base-1.0".to_string(),
             resolution: (1024,1024),
             save_model_as: ModelFileFormat::Safetensors,
             network_module: "networks.lora".to_string(),
@@ -196,7 +193,7 @@ impl Trainer {
         .args(["--reg_data_dir", &Self::reg_dir(training_dir).display().to_string()])
         .args(["--output_dir", &parameters.output.directory.display().to_string()])
         .args(["--output_name", &parameters.output.name])
-        .args(["--pretrained_model_name_or_path", &self.pretrained_model_name_or_path])
+        .args(["--pretrained_model_name_or_path", &parameters.training.pretrained_model])
         .args(["--resolution", &format!("{},{}", self.resolution.0, self.resolution.1)])
         .args(["--save_model_as", &self.save_model_as.to_string()])
         .args(["--network_alpha", &parameters.network.alpha.to_string()])

@@ -10,7 +10,7 @@ authors = ["Danilo Guanabara <danilo@sensorial.systems>"]
 keywords = ["stable-diffusion", "generative-ai", "trainer"]
 
 [workspace.dependencies]
-stable-diffusion-trainer = "0.1.3"
+stable-diffusion-trainer = { path = "trainer/lib"}
 
 [workspace]
 resolver = "2"
