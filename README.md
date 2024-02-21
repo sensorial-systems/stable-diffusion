@@ -104,3 +104,11 @@ The training parameters looks like this:
 }
 ```
 </details>
+
+### Understanding Stable Diffusion LoRA training
+
+Maybe you want to understand
+
+* [Learning rate schedulers, network dimension and alpha](https://medium.com/@dreamsarereal/understanding-lora-training-part-1-learning-rate-schedulers-network-dimension-and-alpha-c88a8658beb7)
+* [Offset noise, epochs and repeats](https://medium.com/@dreamsarereal/understanding-lora-training-part-2-offset-noise-epochs-and-repeats-c68b86c69da8)
+* [Block weights](https://medium.com/@dreamsarereal/understanding-lora-training-part-3-block-weights-967711816280)
