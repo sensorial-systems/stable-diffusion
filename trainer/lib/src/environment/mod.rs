@@ -82,9 +82,9 @@ impl Environment {
     pub fn activate(&mut self) {
         std::env::set_var("PYTHONPATH", self.kohya_ss.join("venv").join("Lib").join("site-packages"));
         #[cfg(target_os = "windows")]
-        std::env::set_var("PATH", format!("{};{}", std::env::var("PATH").unwrap(), self.binary_path().display()));
+        std::env::set_var("PATH", format!("{};{}", self.binary_path().display(), std::env::var("PATH").unwrap()));
         #[cfg(not(target_os = "windows"))]
-        std::env::set_var("PATH", format!("{}:{}", std::env::var("PATH").unwrap(), self.binary_path().display()));
+        std::env::set_var("PATH", format!("{}:{}", self.binary_path().display(), std::env::var("PATH").unwrap()));
         // FIXME: This is too invasive. It should be done in a more controlled way.
         self.previous_dir = std::env::current_dir().unwrap();
         std::env::set_current_dir(&self.kohya_ss).unwrap();

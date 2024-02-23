@@ -215,7 +215,8 @@ impl Trainer {
         .args(["--max_grad_norm", &self.max_grad_norm.to_string()])
         .args(["--max_data_loader_n_workers", &self.max_data_loader_n_workers.to_string()])
         
-        .args(["--optimizer_args", "scale_parameter=False", "relative_step=False", "warmup_init=False"])
+        // Move it to Adafactor
+        // .args(["--optimizer_args", "scale_parameter=False", "relative_step=False", "warmup_init=False"])
         
         .arg("--xformers")
         .arg("--enable_bucket")
