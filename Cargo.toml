@@ -17,4 +17,4 @@ resolver = "2"
 members = [
     "trainer/lib",
     "trainer/cli"
-]
+, "stable-diffusion"]
