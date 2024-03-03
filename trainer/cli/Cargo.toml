@@ -11,6 +11,10 @@ license.workspace = true
 authors.workspace = true
 keywords.workspace = true
 
+[[bin]]
+name = "stable-diffusion"
+path = "src/main.rs"
+
 [dependencies]
 stable-diffusion-trainer.workspace = true
 clap = { version = "4", features = ["derive"] }
