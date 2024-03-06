@@ -26,14 +26,18 @@ impl TokenizerWeights {
         File::Repository(crate::Repository::new("laion/CLIP-ViT-bigG-14-laion2B-39B-b160k", "tokenizer.json"))
     }
 
-    pub fn new(version: StableDiffusionVersion) -> anyhow::Result<Self> {
+    pub fn from_file(tokenizer: File, tokenizer2: Option<File>) -> Self {
+        Self { tokenizer, tokenizer2 }
+    }
+
+    pub fn from_repository(version: StableDiffusionVersion) -> Self {
         let tokenizer = Self::tokenizer1(version);
         let tokenizer2 = if matches!(version, StableDiffusionVersion::XL | StableDiffusionVersion::Turbo) {
             Some(Self::tokenizer2())
         } else {
             None
         };
-        Ok(Self { tokenizer, tokenizer2 })
+        Self::from_file(tokenizer, tokenizer2)
     }
 }
 

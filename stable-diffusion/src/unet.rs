@@ -10,7 +10,8 @@ pub struct UNetWeights {
 }
 
 impl UNetWeights {
-    pub fn from_file(file: File) -> Self {
+    pub fn from_file(file: impl Into<File>) -> Self {
+        let file = file.into();
         Self { file }
     }
 
@@ -22,10 +23,10 @@ impl UNetWeights {
         }
     }
 
-    pub fn new(repository: impl Into<String>, dtype: DType) -> anyhow::Result<Self> {
+    pub fn from_repository(repository: impl Into<String>, dtype: DType) -> Self {
         let path = Self::default_path(dtype);
         let file = File::Repository(crate::Repository::new(repository.into(), path));
-        Ok(Self::from_file(file))
+        Self::from_file(file)
     }
 }
 

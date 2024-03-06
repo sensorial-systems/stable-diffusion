@@ -25,7 +25,13 @@ impl CLIPWeights {
         }
     }
 
-    pub fn new(repository: impl Into<String>, version: StableDiffusionVersion, dtype: DType) -> anyhow::Result<Self> {
+    pub fn from_file(clip: impl Into<File>, clip2: Option<impl Into<File>>) -> Self {
+        let clip = clip.into();
+        let clip2 = clip2.map(Into::into);
+        Self { clip, clip2 }
+    }
+
+    pub fn from_repository(repository: impl Into<String>, version: StableDiffusionVersion, dtype: DType) -> Self {
         let repo = repository.into();
         let filename = Self::clip_file(dtype);
         let clip = File::Repository(crate::Repository::new(repo.clone(), filename));
@@ -36,7 +42,7 @@ impl CLIPWeights {
         } else {
             None
         };
-        Ok(Self { clip, clip2 })
+        Self::from_file(clip, clip2)
     }
 }
 

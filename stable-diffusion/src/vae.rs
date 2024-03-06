@@ -14,7 +14,7 @@ impl VAEWeights {
         Self { file }
     }
 
-    pub fn new(repository: impl Into<String>, version: StableDiffusionVersion, dtype: DType) -> anyhow::Result<Self> {
+    pub fn from_repository(repository: impl Into<String>, version: StableDiffusionVersion, dtype: DType) -> Self {
         let use_f16 = dtype == DType::F16;
         let repository = repository.into();
         let (repo, filename) = if use_f16 {
@@ -33,7 +33,7 @@ impl VAEWeights {
             (repo, filename)
         };
         let file = File::Repository(crate::Repository::new(repo, filename));
-        Ok(Self::from_file(file))
+        Self::from_file(file)
     }
 
 }

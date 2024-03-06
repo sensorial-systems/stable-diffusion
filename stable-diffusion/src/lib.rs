@@ -26,21 +26,19 @@ pub struct StableDiffusionParameters {
 }
 
 impl StableDiffusionParameters {
-    pub fn new(version: StableDiffusionVersion, repository: Option<String>, device: Device) -> anyhow::Result<Self> {
-        let repository = repository.unwrap_or(version.repo().to_string());
-        let precision = DType::F16;
-        let weights = StableDiffusionWeights::new(repository, version, precision)?;
+    pub fn new(version: StableDiffusionVersion, weights: StableDiffusionWeights, device: Device, dtype: DType) -> anyhow::Result<Self> {
         let config = match version {
             StableDiffusionVersion::V1_5 => stable_diffusion::StableDiffusionConfig::v1_5(None, None, None),
             StableDiffusionVersion::V2_1 => stable_diffusion::StableDiffusionConfig::v2_1(None, None, None),
             StableDiffusionVersion::XL => stable_diffusion::StableDiffusionConfig::sdxl(None, None, None),
             StableDiffusionVersion::Turbo => stable_diffusion::StableDiffusionConfig::sdxl_turbo(None, None, None),
         };
-        Ok(Self { device, version, weights, dtype: precision, config })
+        Ok(Self { device, version, weights, dtype, config })
     }
 }
 
 pub struct StableDiffusionWeights {
+    pub dtype: DType,
     pub unet: UNetWeights,
     pub vae: VAEWeights,
     pub clip: CLIPWeights,
@@ -48,12 +46,33 @@ pub struct StableDiffusionWeights {
 }
 
 impl StableDiffusionWeights {
-    pub fn new(repository: String, version: StableDiffusionVersion, dtype: DType) -> anyhow::Result<Self> {
-        let unet = UNetWeights::new(&repository, dtype)?;
-        let vae = VAEWeights::new(&repository, version, dtype)?;
-        let clip = CLIPWeights::new(&repository, version, dtype)?;
-        let tokenizer = TokenizerWeights::new(version)?;
-        Ok(Self { unet, vae, clip, tokenizer})
+    pub fn new(version: StableDiffusionVersion, dtype: DType) -> Self {
+        Self::from_repository(version, Some(version.repo().into()), dtype)
+    }
+
+    pub fn from_repository(version: StableDiffusionVersion, repository: Option<String>, dtype: DType) -> Self {
+        let repository = repository.unwrap_or_else(|| version.repo().to_string());
+        let unet = UNetWeights::from_repository(&repository, dtype);
+        let vae = VAEWeights::from_repository(&repository, version, dtype);
+        let clip = CLIPWeights::from_repository(&repository, version, dtype);
+        let tokenizer = TokenizerWeights::from_repository(version);
+        Self { dtype, unet, vae, clip, tokenizer }
+    }
+
+    pub fn with_unet(self, unet: UNetWeights) -> Self {
+        Self { unet, ..self }
+    }
+
+    pub fn with_vae(self, vae: VAEWeights) -> Self {
+        Self { vae, ..self }
+    }
+
+    pub fn with_clip(self, clip: CLIPWeights) -> Self {
+        Self { clip, ..self }
+    }
+
+    pub fn with_tokenizer(self, tokenizer: TokenizerWeights) -> Self {
+        Self { tokenizer, ..self }
     }
 }
 
@@ -73,12 +92,20 @@ pub struct StableDiffusion {
 pub struct GenerationParameters {
     pub prompt: String,
     pub uncond_prompt: String,
+    pub style_prompt: Option<String>,
+    pub uncond_style_prompt: Option<String>,
     pub width: Option<usize>,
     pub height: Option<usize>,
     pub n_steps: Option<usize>,
     pub guidance_scale: Option<f64>,
     pub img2img: Option<image::ImageBuffer<image::Rgb<u8>, Vec<u8>>>,
     pub img2img_strength: f64,
+}
+
+impl From<String> for GenerationParameters {
+    fn from(prompt: String) -> Self {
+        Self::new(prompt)
+    }
 }
 
 impl GenerationParameters {
@@ -89,13 +116,23 @@ impl GenerationParameters {
         let height = Default::default();
         let n_steps = Default::default();
         let guidance_scale = Default::default();
+        let style_prompt = Default::default();
+        let uncond_style_prompt = Default::default();
         let img2img = Default::default();
         let img2img_strength = 0.5;
-        Self { prompt, uncond_prompt, width, height, n_steps, guidance_scale, img2img, img2img_strength }
+        Self { prompt, uncond_prompt, style_prompt, uncond_style_prompt, width, height, n_steps, guidance_scale, img2img, img2img_strength }
     }
 
     pub fn with_uncond_prompt(self, uncond_prompt: String) -> Self {
         Self { uncond_prompt, ..self }
+    }
+
+    pub fn with_style_prompt(self, style_prompt: Option<String>) -> Self {
+        Self { style_prompt, ..self }
+    }
+
+    pub fn with_uncond_style_prompt(self, uncond_style_prompt: Option<String>) -> Self {
+        Self { uncond_style_prompt, ..self }
     }
 
     pub fn with_width(self, width: Option<usize>) -> Self {
@@ -152,7 +189,7 @@ impl StableDiffusion {
         Ok(Self { version, device, dtype, config, unet, vae, tokenizer, clip, tokenizer_2, clip_2 })
     }
 
-    pub fn generate(&self, args: GenerationParameters) -> Result<image::ImageBuffer<image::Rgb<u8>, Vec<u8>>> {
+    pub fn generate(&self, args: impl Into<GenerationParameters>) -> Result<image::ImageBuffer<image::Rgb<u8>, Vec<u8>>> {
         let GenerationParameters {
             prompt,
             uncond_prompt,
@@ -161,8 +198,10 @@ impl StableDiffusion {
             img2img,
             img2img_strength,
             width,
-            height
-        } = args;
+            height,
+            style_prompt,
+            uncond_style_prompt
+        } = args.into();
         let width = width.unwrap_or(self.config.width);
         let height = height.unwrap_or(self.config.height);
     
@@ -209,7 +248,12 @@ impl StableDiffusion {
             )?);
         }
         if matches!(self.version, StableDiffusionVersion::XL | StableDiffusionVersion::Turbo) {
-            let (prompt, uncond_prompt) = self.tokenizer_2.as_ref().unwrap().tokenize_pair(&prompt, uncond_prompt)?;
+            let style_prompt = style_prompt.unwrap_or_default();
+            let uncond_style_prompt = Some(
+                uncond_style_prompt
+                .as_ref().map(|s| s.as_str())
+                .unwrap_or(""));
+            let (prompt, uncond_prompt) = self.tokenizer_2.as_ref().unwrap().tokenize_pair(&style_prompt, uncond_style_prompt)?;
             text_embeddings.push(self.clip_2.as_ref().unwrap().text_embeddings_pair(
                 prompt,
                 uncond_prompt,

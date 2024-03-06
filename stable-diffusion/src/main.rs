@@ -41,9 +41,15 @@ pub struct Args {
     #[arg(long, default_value = "")]
     uncond_prompt: String,
 
+    #[arg(long)]
+    style_prompt: Option<String>,
+
+    #[arg(long)]
+    uncond_style_prompt: Option<String>,
+
     /// Run on CPU rather than on GPU.
     #[arg(long)]
-    pub cpu: bool,
+    cpu: bool,
 
     /// The height in pixels of the generated image.
     #[arg(long)]
@@ -68,16 +74,6 @@ pub struct Args {
     #[arg(long, value_enum, default_value = "v2-1")]
     sd_version: StableDiffusionVersion,
 
-    /// Generate intermediary images at each step.
-    #[arg(long, action)]
-    intermediary_images: bool,
-
-    #[arg(long)]
-    use_flash_attn: bool,
-
-    #[arg(long)]
-    use_f16: bool,
-
     #[arg(long)]
     guidance_scale: Option<f64>,
 
@@ -90,7 +86,6 @@ pub struct Args {
     #[arg(long, default_value_t = 0.8)]
     img2img_strength: f64,
 }
-
 
 fn image_preprocess<T: AsRef<std::path::Path>>(path: T) -> anyhow::Result<image::ImageBuffer<image::Rgb<u8>, Vec<u8>>> {
     let img = image::io::Reader::open(path)?.decode()?;
@@ -108,13 +103,17 @@ fn image_preprocess<T: AsRef<std::path::Path>>(path: T) -> anyhow::Result<image:
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     let device = device(args.cpu)?;
-    let parameters = StableDiffusionParameters::new(args.sd_version, args.repository, device)?;
+    let weights = StableDiffusionWeights::from_repository(args.sd_version, args.repository, DType::F32);
+    let parameters = StableDiffusionParameters::new(args.sd_version, weights, device, DType::BF16)?;
     let stable_diffusion = StableDiffusion::new(parameters)?;
     let args = GenerationParameters::new(args.prompt)
         .with_width(args.width)
         .with_height(args.height)
         .with_uncond_prompt(args.uncond_prompt)
+        .with_style_prompt(args.style_prompt)
+        .with_uncond_style_prompt(args.uncond_style_prompt)
         .with_n_steps(args.n_steps)
+        .with_guidance_scale(args.guidance_scale)
         .with_img2img(args.img2img.as_ref().and_then(|path| image_preprocess(path).ok()))
         .with_img2img_strength(args.img2img_strength);
     let image = stable_diffusion.generate(args)?;
