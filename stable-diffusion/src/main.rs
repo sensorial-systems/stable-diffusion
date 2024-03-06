@@ -106,11 +106,11 @@ fn main() -> anyhow::Result<()> {
     let weights = StableDiffusionWeights::from_repository(args.sd_version, args.repository, DType::F32);
     let parameters = StableDiffusionParameters::new(args.sd_version, weights, device, DType::BF16)?;
     let stable_diffusion = StableDiffusion::new(parameters)?;
-    let args = GenerationParameters::new(args.prompt)
+    let args = GenerationParameters::new(args.prompt.clone())
         .with_width(args.width)
         .with_height(args.height)
         .with_uncond_prompt(args.uncond_prompt)
-        .with_style_prompt(args.style_prompt)
+        .with_style_prompt(Some(args.prompt))
         .with_uncond_style_prompt(args.uncond_style_prompt)
         .with_n_steps(args.n_steps)
         .with_guidance_scale(args.guidance_scale)
