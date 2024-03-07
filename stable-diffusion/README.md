@@ -13,8 +13,8 @@ This is the Stable Diffusion core library.
 
 ## Backends
 
+* Cuda (default rust-feature)
 * Metal
-* Cuda
 * Onnx
 * CPU
 

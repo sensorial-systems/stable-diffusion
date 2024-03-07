@@ -42,5 +42,5 @@ resolver = "2"
 members = [
     "stable-diffusion",
     "stable-diffusion-trainer",
-    "cli"
+    "stable-diffusion-cli"
 ]
