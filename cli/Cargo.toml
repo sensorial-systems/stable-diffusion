@@ -1,5 +1,5 @@
 [package]
-name = "cli"
+name = "stable-diffusion-cli"
 readme = "README.md"
 version.workspace = true
 description = "Stable Diffusion CLI"
