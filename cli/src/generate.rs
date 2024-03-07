@@ -111,6 +111,16 @@ fn image_preprocess<T: AsRef<std::path::Path>>(path: T) -> anyhow::Result<image:
     Ok(img.to_rgb8())
 }
 
+fn view(output: &str) -> anyhow::Result<()> {
+    #[cfg(target_os = "windows")]
+    std::process::Command::new("explorer").arg(output).output()?;
+    #[cfg(target_os = "macos")]
+    std::process::Command::new("open").arg(output).output()?;
+    #[cfg(target_os = "linux")]
+    std::process::Command::new("xdg-open").arg(output).output()?;
+    Ok(())
+}
+
 impl Arguments {
     pub fn execute(self) -> anyhow::Result<()> {
         let args = self;
@@ -131,7 +141,7 @@ impl Arguments {
             .with_img2img_strength(args.img2img_strength);
         let image = stable_diffusion.generate(args)?;
         image.save(&output)?;
-        std::process::Command::new("explorer").arg(output).output()?;
+        view(&output)?;
         Ok(())
     }
 }
