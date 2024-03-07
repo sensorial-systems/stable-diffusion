@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 mod dtype;
 mod vae;
 mod clip;
@@ -14,9 +16,10 @@ pub use file::*;
 
 use candle_transformers::models::stable_diffusion::{self, StableDiffusionConfig};
 
-pub use anyhow::{Error as E, Result};
+pub use anyhow::{Error, Result};
 use candle::{Device, Tensor, D};
 
+/// The `StableDiffusionParameters` struct is used to specify the parameters of the Stable Diffusion model.
 pub struct StableDiffusionParameters {
     version: StableDiffusionVersion,
     weights: StableDiffusionWeights,
@@ -26,6 +29,7 @@ pub struct StableDiffusionParameters {
 }
 
 impl StableDiffusionParameters {
+    /// Create a new `StableDiffusionParameters` instance.
     pub fn new(version: StableDiffusionVersion, weights: StableDiffusionWeights, device: Device, dtype: DType) -> anyhow::Result<Self> {
         let config = match version {
             StableDiffusionVersion::V1_5 => stable_diffusion::StableDiffusionConfig::v1_5(None, None, None),
@@ -37,6 +41,7 @@ impl StableDiffusionParameters {
     }
 }
 
+/// The `StableDiffusionWeights` struct is used to specify the weights of the Stable Diffusion model.
 pub struct StableDiffusionWeights {
     pub dtype: DType,
     pub unet: UNetWeights,
@@ -46,10 +51,12 @@ pub struct StableDiffusionWeights {
 }
 
 impl StableDiffusionWeights {
+    /// Create a new `StableDiffusionWeights` instance from a version and dtype.
     pub fn new(version: StableDiffusionVersion, dtype: DType) -> Self {
         Self::from_repository(version, Some(version.repo().into()), dtype)
     }
 
+    /// Create a new `StableDiffusionWeights` instance from a version, repository, and dtype.
     pub fn from_repository(version: StableDiffusionVersion, repository: Option<String>, dtype: DType) -> Self {
         let repository = repository.unwrap_or_else(|| version.repo().to_string());
         let unet = UNetWeights::from_repository(&repository, dtype);
@@ -59,23 +66,28 @@ impl StableDiffusionWeights {
         Self { dtype, unet, vae, clip, tokenizer }
     }
 
+    /// Sets the weights of the UNet model.
     pub fn with_unet(self, unet: UNetWeights) -> Self {
         Self { unet, ..self }
     }
 
+    /// Sets the weights of the VAE model.
     pub fn with_vae(self, vae: VAEWeights) -> Self {
         Self { vae, ..self }
     }
 
+    /// Sets the weights of the CLIP model.
     pub fn with_clip(self, clip: CLIPWeights) -> Self {
         Self { clip, ..self }
     }
 
+    /// Sets the weights of the Tokenizer model.
     pub fn with_tokenizer(self, tokenizer: TokenizerWeights) -> Self {
         Self { tokenizer, ..self }
     }
 }
 
+/// The `StableDiffusion` struct is used to specify the Stable Diffusion model.
 pub struct StableDiffusion {
     version: StableDiffusionVersion,
     device: Device,
@@ -89,6 +101,7 @@ pub struct StableDiffusion {
     clip_2: Option<CLIP>,
 }
 
+/// The `GenerationParameters` struct is used to specify the parameters of the generation process.
 pub struct GenerationParameters {
     pub prompt: String,
     pub uncond_prompt: String,
@@ -109,6 +122,7 @@ impl From<String> for GenerationParameters {
 }
 
 impl GenerationParameters {
+    /// Create a new `GenerationParameters` instance from a prompt.
     pub fn new(prompt: String) -> Self {
         let prompt = prompt;
         let uncond_prompt = Default::default();
@@ -123,44 +137,54 @@ impl GenerationParameters {
         Self { prompt, uncond_prompt, style_prompt, uncond_style_prompt, width, height, n_steps, guidance_scale, img2img, img2img_strength }
     }
 
+    /// Sets the unconditional prompt.
     pub fn with_uncond_prompt(self, uncond_prompt: String) -> Self {
         Self { uncond_prompt, ..self }
     }
 
+    /// Sets the style prompt.
     pub fn with_style_prompt(self, style_prompt: Option<String>) -> Self {
         Self { style_prompt, ..self }
     }
 
+    /// Sets the unconditional style prompt.
     pub fn with_uncond_style_prompt(self, uncond_style_prompt: Option<String>) -> Self {
         Self { uncond_style_prompt, ..self }
     }
 
+    /// Sets the width.
     pub fn with_width(self, width: Option<usize>) -> Self {
         Self { width, ..self }
     }
 
+    /// Sets the height.
     pub fn with_height(self, height: Option<usize>) -> Self {
         Self { height, ..self }
     }
 
+    /// Sets the number of steps.
     pub fn with_n_steps(self, n_steps: Option<usize>) -> Self {
         Self { n_steps, ..self }
     }
 
+    /// Sets the guidance scale.
     pub fn with_guidance_scale(self, guidance_scale: Option<f64>) -> Self {
         Self { guidance_scale, ..self }
     }
 
+    /// Sets the image to image.
     pub fn with_img2img(self, img2img: Option<image::ImageBuffer<image::Rgb<u8>, Vec<u8>>>) -> Self {
         Self { img2img, ..self }
     }
 
+    /// Sets the image to image strength.
     pub fn with_img2img_strength(self, img2img_strength: f64) -> Self {
         Self { img2img_strength, ..self }
     }
 }
 
 impl StableDiffusion {
+    /// Create a new `StableDiffusion` instance from parameters.
     pub fn new(parameters: StableDiffusionParameters) -> Result<Self> {
         let device = parameters.device;
         let config = parameters.config;
@@ -189,6 +213,7 @@ impl StableDiffusion {
         Ok(Self { version, device, dtype, config, unet, vae, tokenizer, clip, tokenizer_2, clip_2 })
     }
 
+    /// Generate an image from the model.
     pub fn generate(&self, args: impl Into<GenerationParameters>) -> Result<image::ImageBuffer<image::Rgb<u8>, Vec<u8>>> {
         let GenerationParameters {
             prompt,
@@ -331,6 +356,7 @@ impl StableDiffusion {
     }
 }
 
+/// The `StableDiffusion` struct is used to specify the Stable Diffusion model.
 #[derive(Debug, Clone, Copy, clap::ValueEnum, PartialEq, Eq)]
 pub enum StableDiffusionVersion {
     V1_5,

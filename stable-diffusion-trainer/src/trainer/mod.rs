@@ -144,6 +144,7 @@ impl Trainer {
         std::fs::create_dir_all(training_dir.join("model")).unwrap();
         std::fs::create_dir_all(&image_dir).unwrap();
         std::fs::create_dir_all(&class_dir).unwrap();
+        println!("{}", parameters.dataset.training.path().display());
         for file in parameters.dataset.training.path().read_dir().unwrap() {
             let file = file.unwrap().path();
             let file_name = file.file_name().unwrap();

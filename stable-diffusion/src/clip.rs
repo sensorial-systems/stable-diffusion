@@ -1,10 +1,15 @@
+//! CLIP (Contrastive Language-Image Pretraining) model.
+
 use candle::{DType, Device, Module, Tensor};
 use candle_transformers::models::stable_diffusion::{self, clip::{self, ClipTextTransformer}};
 
 use crate::{File, StableDiffusionVersion};
 
+/// The `CLIPWeights` struct is used to specify the weights of the CLIP model.
 pub struct CLIPWeights {
+    /// The weights of the first CLIP model.
     pub clip: File,
+    /// The weights of the second CLIP model.
     pub clip2: Option<File>
 }
 
@@ -25,12 +30,14 @@ impl CLIPWeights {
         }
     }
 
+    /// Create a new `CLIPWeights` instance from a file.
     pub fn from_file(clip: impl Into<File>, clip2: Option<impl Into<File>>) -> Self {
         let clip = clip.into();
         let clip2 = clip2.map(Into::into);
         Self { clip, clip2 }
     }
 
+    /// Create a new `CLIPWeights` instance from a repository.
     pub fn from_repository(repository: impl Into<String>, version: StableDiffusionVersion, dtype: DType) -> Self {
         let repo = repository.into();
         let filename = Self::clip_file(dtype);
@@ -47,22 +54,26 @@ impl CLIPWeights {
 }
 
 
+/// The `CLIP` struct is used to specify the CLIP model.
 pub struct CLIP {
     clip: ClipTextTransformer
 }
 
 impl CLIP {
+    /// Create a new `CLIP` instance from a configuration, weights, device, and data type.
     pub fn new(config: &clip::Config, weights: impl AsRef<std::path::Path>, device: &Device, dtype: DType) -> anyhow::Result<Self> {
         let clip = stable_diffusion::build_clip_transformer(config, weights, device, dtype)?;
         Ok(Self { clip })
     }
 
+    /// Encode text into a tensor.
     pub fn text_embeddings(&self, prompt_tokens: impl AsRef<[u32]>, device: &Device, dtype: DType) -> anyhow::Result<Tensor> {
         let tokens = Tensor::new(prompt_tokens.as_ref(), device)?.unsqueeze(0)?;
         let text_embeddings = self.clip.forward(&tokens)?;
         Ok(text_embeddings.to_dtype(dtype)?)
     }
 
+    /// Encode text into a tensor pair.
     pub fn text_embeddings_pair(&self, prompt_tokens: impl AsRef<[u32]>, uncond_prompt: Option<impl AsRef<[u32]>>, device: &Device, dtype: DType) -> anyhow::Result<Tensor> {
         let tokens = Tensor::new(prompt_tokens.as_ref(), device)?.unsqueeze(0)?;
         let text_embeddings = self.clip.forward(&tokens)?;

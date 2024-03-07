@@ -1,6 +1,6 @@
 [workspace.package]
 version = "0.1.5"
-description = "Stable Diffusion kohya_ss wrapper"
+description = "Stable Diffusion"
 license = "Apache-2.0"
 documentation = "https://docs.rs/stable-diffusion-trainer"
 repository = "https://github.com/sensorial-systems/stable-diffusion"
@@ -10,7 +10,8 @@ authors = ["Danilo Guanabara <danilo@sensorial.systems>"]
 keywords = ["stable-diffusion", "generative-ai", "trainer"]
 
 [workspace.dependencies]
-stable-diffusion-trainer = { path = "trainer/lib"}
+stable-diffusion = { path = "stable-diffusion"}
+stable-diffusion-trainer = { path = "stable-diffusion-trainer"}
 
 anyhow = { version = "1", features = ["backtrace"] }
 candle = { package = "candle-core", version = "0.4.1" }
@@ -34,7 +35,7 @@ tokenizers = { version = "0.15.0", default-features = false }
 [workspace]
 resolver = "2"
 members = [
-    "trainer/lib",
-    "trainer/cli",
-    "stable-diffusion"
+    "stable-diffusion",
+    "stable-diffusion-trainer",
+    "cli"
 ]

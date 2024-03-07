@@ -1,5 +1,6 @@
 [package]
 name = "stable-diffusion"
+readme = "README.md"
 version.workspace = true
 description.workspace = true
 license.workspace = true
@@ -11,7 +12,7 @@ authors.workspace = true
 keywords.workspace = true
 
 [features]
-default = []
+default = ["cuda"]
 cuda = ["candle/cuda", "candle-nn/cuda", "candle-transformers/cuda", "dep:bindgen_cuda"]
 cudnn = ["candle/cudnn"]
 flash-attn = ["cuda", "candle-transformers/flash-attn", "dep:candle-flash-attn"]

@@ -25,9 +25,9 @@ pub fn device(cpu: bool) -> Result<Device> {
 }
 
 
-#[derive(Parser, Clone)]
+#[derive(Debug, Parser, Clone)]
 #[command(author, version, about, long_about = None)]
-pub struct Args {
+pub struct Arguments {
     /// The prompt to be used for image generation.
     #[arg(
         long,
@@ -35,15 +35,23 @@ pub struct Args {
     )]
     prompt: String,
 
+    /// The output file to save the generated image to.
+    #[arg(long)]
+    output: Option<String>,
+    
+    /// The repository to download the weights from.
     #[arg(long)]
     repository: Option<String>,
 
+    /// The unconditional prompt to be used for image generation.
     #[arg(long, default_value = "")]
     uncond_prompt: String,
 
+    /// The style prompt to be used for image generation.
     #[arg(long)]
     style_prompt: Option<String>,
 
+    /// The unconditional style prompt to be used for image generation.
     #[arg(long)]
     uncond_style_prompt: Option<String>,
 
@@ -71,14 +79,17 @@ pub struct Args {
     #[arg(long, value_name = "FILE", default_value = "sd_final.png")]
     final_image: String,
 
+    /// The version of the stable diffusion model to use.
     #[arg(long, value_enum, default_value = "v2-1")]
     sd_version: StableDiffusionVersion,
 
+    /// The scale of the guidance image.
     #[arg(long)]
     guidance_scale: Option<f64>,
 
+    /// The image to image transformation to apply.
     #[arg(long, value_name = "FILE")]
-    pub img2img: Option<String>,
+    img2img: Option<String>,
 
     /// The strength, indicates how much to transform the initial image. The
     /// value must be between 0 and 1, a value of 1 discards the initial image
@@ -100,24 +111,27 @@ fn image_preprocess<T: AsRef<std::path::Path>>(path: T) -> anyhow::Result<image:
     Ok(img.to_rgb8())
 }
 
-fn main() -> anyhow::Result<()> {
-    let args = Args::parse();
-    let device = device(args.cpu)?;
-    let weights = StableDiffusionWeights::from_repository(args.sd_version, args.repository, DType::F32);
-    let parameters = StableDiffusionParameters::new(args.sd_version, weights, device, DType::BF16)?;
-    let stable_diffusion = StableDiffusion::new(parameters)?;
-    let args = GenerationParameters::new(args.prompt.clone())
-        .with_width(args.width)
-        .with_height(args.height)
-        .with_uncond_prompt(args.uncond_prompt)
-        .with_style_prompt(Some(args.prompt))
-        .with_uncond_style_prompt(args.uncond_style_prompt)
-        .with_n_steps(args.n_steps)
-        .with_guidance_scale(args.guidance_scale)
-        .with_img2img(args.img2img.as_ref().and_then(|path| image_preprocess(path).ok()))
-        .with_img2img_strength(args.img2img_strength);
-    let image = stable_diffusion.generate(args)?;
-    image.save("output.png")?;
-    std::process::Command::new("explorer").arg("output.png").output()?;
-    Ok(())
+impl Arguments {
+    pub fn execute(self) -> anyhow::Result<()> {
+        let args = self;
+        let device = device(args.cpu)?;
+        let output = args.output.as_ref().map(String::from).unwrap_or(String::from("output.png"));
+        let weights = StableDiffusionWeights::from_repository(args.sd_version, args.repository, DType::F32);
+        let parameters = StableDiffusionParameters::new(args.sd_version, weights, device, DType::BF16)?;
+        let stable_diffusion = StableDiffusion::new(parameters)?;
+        let args = GenerationParameters::new(args.prompt.clone())
+            .with_width(args.width)
+            .with_height(args.height)
+            .with_uncond_prompt(args.uncond_prompt)
+            .with_style_prompt(Some(args.prompt))
+            .with_uncond_style_prompt(args.uncond_style_prompt)
+            .with_n_steps(args.n_steps)
+            .with_guidance_scale(args.guidance_scale)
+            .with_img2img(args.img2img.as_ref().and_then(|path| image_preprocess(path).ok()))
+            .with_img2img_strength(args.img2img_strength);
+        let image = stable_diffusion.generate(args)?;
+        image.save(&output)?;
+        std::process::Command::new("explorer").arg(output).output()?;
+        Ok(())
+    }
 }

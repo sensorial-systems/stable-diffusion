@@ -20,7 +20,7 @@ pub struct Parameters {
 
 impl Parameters {
     /// Get the parameters from a file.
-    pub fn from_file(path: impl Into<std::path::PathBuf>) -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn from_file(path: impl Into<std::path::PathBuf>) -> anyhow::Result<Self> {
         use path_slash::*;
 
         let path = path.into().canonicalize()?;

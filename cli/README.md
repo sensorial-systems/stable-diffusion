@@ -1,14 +1,43 @@
 [![](https://dcbadge.vercel.app/api/server/rzaesS82MT)](https://discord.gg/rzaesS82MT)
 
-# Stable Diffusion XL LoRA Trainer
 
-Welcome to the official codebase for the Sensorial System's Stable Diffusion projects. For now, this only hosts the codebase for our Stable Diffusion XL LoRA Trainer, designed to make it easier to automate all the steps of finetuning Stable Diffusion models.
+# Stable Diffusion CLI
 
-## Requirements
+Install the CLI tool:
+```bash
+cargo install stable-diffusion-cli
+```
+
+Get help to use the cli:
+```bash
+stable-diffusion --help
+```
+
+## Training requirements
 
 - **kohya_ss**: Follow the installation guidelines here [https://github.com/bmaltais/kohya_ss](https://github.com/bmaltais/kohya_ss).
 
+
+Setup the training environment:
+```bash
+stable-diffusion train setup
+```
+
 ## Examples
+
+#### Generation example
+
+To generate an image, simply run:
+```bash
+stable-diffusion generate --prompt "A green apple"
+```
+
+To check all the generation parameters:
+```bash
+stable-diffusion generate --help
+```
+
+#### Training example
 
 We have a [dataset with photos of Bacana](examples/training/lora/bacana/images), a Coton de Tuléar, conceptualized as `bacana white dog` to not mix with the existing `Coton de Tuléar` concept in the `Stable Diffusion XL` model.
 
@@ -19,32 +48,39 @@ Some of the training images in [examples/training/lora/bacana/images](examples/t
 <img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/images/IMG_5180.PNG" width="128">
 </p>
 
-The training code example looks like this:
+The training parameters looks like this:
 
-```rust
-use stable_diffusion_trainer::*;
-
-fn main() {
-    let kohya_ss = std::env::var("KOHYA_SS_PATH").expect("KOHYA_SS_PATH not set");
-    let environment = Environment::new().with_kohya_ss(kohya_ss);
-
-    let prompt = Prompt::new("bacana", "white dog");
-    let image_data_set = ImageDataSet::from_dir("examples/training/lora/bacana/images");
-    let data_set = TrainingDataSet::new(image_data_set);
-    let output = Output::new("{prompt.instance}({prompt.class})d{network.dimension}a{network.alpha}", "examples/training/lora/bacana/output");
-    let parameters = Parameters::new(prompt, data_set, output);
-
-    Trainer::new()
-        .with_environment(environment)
-        .start(&parameters);
+```json
+{
+    "prompt": {
+        "instance": "bacana",
+        "class": "white dog"
+    },
+    "dataset": {
+        "training": "images"
+    },
+    "network": {
+        "dimension": 8,
+        "alpha": 1.0
+    },
+    "output": {
+        "name": "{prompt.instance}({prompt.class})d{network.dimension}a{network.alpha}",
+        "directory": "./output"
+    },
+    "training": {
+        "optimizer": "Adafactor",
+        "learning_rate": {
+            "scheduler": "Constant"
+        }    
+    }
 }
 ```
 
-Note that the `Output::name` is a format string that captures the parameters values. This is useful for experimenting with different parameters and keeping track of them in the model file name.
+Note that the `output.name` is a format string that captures the parameters values. This is useful for experimenting with different parameters and keeping track of them in the model file name.
 
 Train the example with:
 ```bash
-KOHYA_SS_PATH=<your kohya_ss path here> cargo run --example train-lora
+stable-diffusion train --config examples/training/lora/bacana/parameters.json
 ```
 
 The LoRA safetensor file will be generated as
@@ -71,3 +107,11 @@ Some of the generated images:
 <img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/generation/bacana as a scientist.png" width="128" />
 <img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/generation/bacana as an astronaut.png" width="128" />
 </p>
+
+## Development tips
+
+### Debugging
+
+To check the training folder structure required by `kohya_ss` set the `TRAINING_DIR` to, for example, `./training` like:
+
+`TRAINING_DIR=./training stable-diffusion train ...`

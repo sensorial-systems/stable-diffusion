@@ -1,9 +1,14 @@
+//! Tokenizer module for Stable Diffusion model.
+
 use candle_transformers::models::stable_diffusion::StableDiffusionConfig;
 
 use crate::{File, StableDiffusionVersion};
 
+/// The `TokenizerWeights` struct is used to specify the weights of the Tokenizer model.
 pub struct TokenizerWeights {
+    /// The weights of the first Tokenizer model.
     pub tokenizer: File,
+    /// The weights of the second Tokenizer model.
     pub tokenizer2: Option<File>,
 }
 
@@ -26,10 +31,12 @@ impl TokenizerWeights {
         File::Repository(crate::Repository::new("laion/CLIP-ViT-bigG-14-laion2B-39B-b160k", "tokenizer.json"))
     }
 
+    /// Create a new `TokenizerWeights` instance from a file.
     pub fn from_file(tokenizer: File, tokenizer2: Option<File>) -> Self {
         Self { tokenizer, tokenizer2 }
     }
 
+    /// Create a new `TokenizerWeights` instance from a repository.
     pub fn from_repository(version: StableDiffusionVersion) -> Self {
         let tokenizer = Self::tokenizer1(version);
         let tokenizer2 = if matches!(version, StableDiffusionVersion::XL | StableDiffusionVersion::Turbo) {
@@ -41,6 +48,7 @@ impl TokenizerWeights {
     }
 }
 
+/// The `Tokenizer` struct is used to specify the Tokenizer model.
 pub struct Tokenizer {
     tokenizer: tokenizers::Tokenizer,
     pad_id: u32,
@@ -48,6 +56,7 @@ pub struct Tokenizer {
 }
 
 impl Tokenizer {
+    /// Create a new `Tokenizer` instance from a configuration and weights.
     pub fn new(config: &StableDiffusionConfig, file: impl AsRef<std::path::Path>) -> anyhow::Result<Tokenizer> {
         let tokenizer = tokenizers::Tokenizer::from_file(file).map_err(anyhow::Error::msg)?;
         let pad_id = match &config.clip.pad_with {
@@ -58,6 +67,7 @@ impl Tokenizer {
         Ok(Tokenizer { pad_id, tokenizer, max_position_embeddings })
     }
 
+    /// Tokenize a text into a vector of tokens.
     pub fn tokenize(&self, text: &str) -> anyhow::Result<Vec<u32>> {
         let mut tokens = self.tokenizer
             .encode(text, true)
@@ -70,6 +80,7 @@ impl Tokenizer {
         Ok(tokens)
     }
 
+    /// Tokenize a pair of texts into a vector of tokens.
     pub fn tokenize_pair(&self, prompt: &str, cond_prompt: Option<&str>) -> anyhow::Result<(Vec<u32>, Option<Vec<u32>>)> {
         let prompt = self.tokenize(prompt)?;
         let cond_prompt = match cond_prompt {

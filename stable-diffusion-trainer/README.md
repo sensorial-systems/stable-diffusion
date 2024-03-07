@@ -8,21 +8,18 @@ Welcome to the official codebase for the Sensorial System's Stable Diffusion pro
 
 - **kohya_ss**: Follow the installation guidelines here [https://github.com/bmaltais/kohya_ss](https://github.com/bmaltais/kohya_ss).
 
-## Stable Diffusion CLI
+## Setting up
 
-Install the CLI tool:
+If you don't want to set the `KOHYA_SS_PATH` environment variable everytime you want to run the trainer, you can run the `CLI` to set it up once and for all:
+
+```bash
+stable-diffusion train setup
+```
+
+If you don't have the `CLI` installed, install it with:
+
 ```bash
 cargo install stable-diffusion-cli
-```
-
-Setup the environment:
-```bash
-stable-diffusion-cli setup
-```
-
-Get help to use the cli:
-```bash
-stable-diffusion-cli train --help
 ```
 
 ## Examples
@@ -36,39 +33,32 @@ Some of the training images in [examples/training/lora/bacana/images](examples/t
 <img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/images/IMG_5180.PNG" width="128">
 </p>
 
-The training parameters looks like this:
+The training code example looks like this:
 
-```json
-{
-    "prompt": {
-        "instance": "bacana",
-        "class": "white dog"
-    },
-    "dataset": {
-        "training": "images"
-    },
-    "network": {
-        "dimension": 8,
-        "alpha": 1.0
-    },
-    "output": {
-        "name": "{prompt.instance}({prompt.class})d{network.dimension}a{network.alpha}",
-        "directory": "./output"
-    },
-    "training": {
-        "optimizer": "Adafactor",
-        "learning_rate": {
-            "scheduler": "Constant"
-        }    
-    }
+```rust
+use stable_diffusion_trainer::*;
+
+fn main() {
+    let kohya_ss = std::env::var("KOHYA_SS_PATH").expect("KOHYA_SS_PATH not set");
+    let environment = Environment::new().with_kohya_ss(kohya_ss);
+
+    let prompt = Prompt::new("bacana", "white dog");
+    let image_data_set = ImageDataSet::from_dir("examples/training/lora/bacana/images");
+    let data_set = TrainingDataSet::new(image_data_set);
+    let output = Output::new("{prompt.instance}({prompt.class})d{network.dimension}a{network.alpha}", "examples/training/lora/bacana/output");
+    let parameters = Parameters::new(prompt, data_set, output);
+
+    Trainer::new()
+        .with_environment(environment)
+        .start(&parameters);
 }
 ```
 
-Note that the `output.name` is a format string that captures the parameters values. This is useful for experimenting with different parameters and keeping track of them in the model file name.
+Note that the `Output::name` is a format string that captures the parameters values. This is useful for experimenting with different parameters and keeping track of them in the model file name.
 
 Train the example with:
 ```bash
-stable-diffusion-cli train --config examples/training/lora/bacana/parameters.json
+KOHYA_SS_PATH=<your kohya_ss path here> cargo run --example train-lora
 ```
 
 The LoRA safetensor file will be generated as
@@ -95,11 +85,3 @@ Some of the generated images:
 <img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/generation/bacana as a scientist.png" width="128" />
 <img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/generation/bacana as an astronaut.png" width="128" />
 </p>
-
-## Development tips
-
-### Debugging
-
-To check the training folder structure required by `kohya_ss` set the `TRAINING_DIR` to, for example, `./training` like:
-
-`TRAINING_DIR=./training stable-diffusion-cli train ...`

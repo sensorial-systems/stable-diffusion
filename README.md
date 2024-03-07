@@ -1,41 +1,41 @@
 [![](https://dcbadge.vercel.app/api/server/rzaesS82MT)](https://discord.gg/rzaesS82MT)
 
-# Stable Diffusion XL LoRA Trainer
+# Stable Diffusion
 
-Welcome to the official codebase for the Sensorial System's Stable Diffusion projects. For now, this only hosts the codebase for our Stable Diffusion XL LoRA Trainer, designed to make it easier to automate all the steps of finetuning Stable Diffusion models.
+Welcome to the official codebase for the Sensorial System's Stable Diffusion projects.
 
 ## Features
 
-- [**Rust Library**: For programmability, a Rust library is made available for developers.](trainer/lib/README.md)
-- [**Command Line Interface (CLI)**: For ease of use, the trainer can be accessed via a CLI, making it accessible for various use cases.](trainer/cli/README.md)
+- **Inference**: Stable Diffusion 1.5, 2.0, XL and Turbo inferences.
+- **Training**: Stable Diffusion XL LoRA training.
 
-## Requirements
+## Sub-projects
 
-- **kohya_ss**: Follow the installation guidelines here [https://github.com/bmaltais/kohya_ss](https://github.com/bmaltais/kohya_ss).
+- [Stable Diffusion](stable-diffusion/README.md): Library core.
+- [Stable Diffusion Trainer](stable-diffusion-trainer/README.md): Trainer library.
+- [Stable Diffusion CLI](cli/README.md): CLI for image generation and model training.
 
 ## Examples
 
-We have a [dataset with photos of Bacana](examples/training/lora/bacana/images), a Coton de Tuléar, conceptualized as `bacana white dog` to not mix with the existing `Coton de Tuléar` concept in the `Stable Diffusion XL` model.
+#### Image generation
 
-It's organized as follows:
-* [Training images examples directory](examples/training/lora/bacana/images)
-<p>
-<img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/images/IMG_5175.PNG" width="128">
-<img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/images/IMG_5176.PNG" width="128">
-<img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/images/IMG_5180.PNG" width="128">
-</p>
+```rust
+use candle::Device;
+use stable_diffusion::*;
 
-* [Generated images examples directory](examples/training/lora/bacana/generation)
-<p>
-<img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/generation/bacana as a fireman.png" width="128" />
-<img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/generation/bacana as a scientist.png" width="128" />
-<img src="https://raw.githubusercontent.com/sensorial-systems/stable-diffusion/main/examples/training/lora/bacana/generation/bacana as an astronaut.png" width="128" />
-</p>
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let device = Device::new_cuda(0)?;
+    let weights = StableDiffusionWeights::new(StableDiffusionVersion::XL, DType::F32);
+    let parameters = StableDiffusionParameters::new(StableDiffusionVersion::XL, weights, device, DType::BF16)?;
+    let stable_diffusion = StableDiffusion::new(parameters)?;
+    let args = GenerationParameters::new("A green apple");
+    let image = stable_diffusion.generate(args)?;
+    image.save("output.png")?;
+    Ok(())
+}
+```
 
-<details>
-<summary>Rust Library</summary>
-
-The training code example looks like this:
+#### XL LoRA training
 
 ```rust
 use stable_diffusion_trainer::*;
@@ -55,60 +55,3 @@ fn main() {
         .start(&parameters);
 }
 ```
-
-</details>
-<details>
-<summary>Stable Diffusion CLI</summary>
-
-Install the CLI tool:
-```bash
-cargo install stable-diffusion-cli
-```
-
-Setup the environment:
-```bash
-stable-diffusion-cli setup
-```
-
-Train the example with:
-```bash
-stable-diffusion-cli train --config examples/training/lora/bacana/parameters.json
-```
-
-
-The training parameters looks like this:
-
-```json
-{
-    "prompt": {
-        "instance": "bacana",
-        "class": "white dog"
-    },
-    "dataset": {
-        "training": "images"
-    },
-    "network": {
-        "dimension": 8,
-        "alpha": 1.0
-    },
-    "output": {
-        "name": "{prompt.instance}({prompt.class})d{network.dimension}a{network.alpha}",
-        "directory": "./output"
-    },
-    "training": {
-        "optimizer": "Adafactor",
-        "learning_rate": {
-            "scheduler": "Constant"
-        }    
-    }
-}
-```
-</details>
-
-### Understanding Stable Diffusion LoRA training
-
-Maybe you want to understand
-
-* [Learning rate schedulers, network dimension and alpha](https://medium.com/@dreamsarereal/understanding-lora-training-part-1-learning-rate-schedulers-network-dimension-and-alpha-c88a8658beb7)
-* [Offset noise, epochs and repeats](https://medium.com/@dreamsarereal/understanding-lora-training-part-2-offset-noise-epochs-and-repeats-c68b86c69da8)
-* [Block weights](https://medium.com/@dreamsarereal/understanding-lora-training-part-3-block-weights-967711816280)

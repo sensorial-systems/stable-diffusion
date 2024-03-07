@@ -1,3 +1,5 @@
+//! UNet model for Stable Diffusion.
+
 use std::path::Path;
 
 use candle::{DType, Device, Tensor};
@@ -5,11 +7,14 @@ use candle_transformers::models::stable_diffusion::{unet_2d::UNet2DConditionMode
 
 use crate::File;
 
+/// The `UNetWeights` struct is used to specify the weights of the UNet model.
 pub struct UNetWeights {
+    /// The weights of the UNet model.
     pub file: File,
 }
 
 impl UNetWeights {
+    /// Create a new `UNetWeights` instance from a file.
     pub fn from_file(file: impl Into<File>) -> Self {
         let file = file.into();
         Self { file }
@@ -23,6 +28,7 @@ impl UNetWeights {
         }
     }
 
+    /// Create a new `UNetWeights` instance from a repository.
     pub fn from_repository(repository: impl Into<String>, dtype: DType) -> Self {
         let path = Self::default_path(dtype);
         let file = File::Repository(crate::Repository::new(repository.into(), path));

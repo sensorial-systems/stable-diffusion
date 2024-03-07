@@ -1,13 +1,13 @@
 [package]
-name = "stable-diffusion-cli"
+name = "cli"
 readme = "README.md"
 version.workspace = true
-edition.workspace = true
-documentation.workspace = true
-homepage.workspace = true
-repository.workspace = true
-description.workspace = true
+description = "Stable Diffusion CLI"
 license.workspace = true
+documentation.workspace = true
+repository.workspace = true
+homepage.workspace = true
+edition.workspace = true
 authors.workspace = true
 keywords.workspace = true
 
@@ -16,6 +16,10 @@ name = "stable-diffusion"
 path = "src/main.rs"
 
 [dependencies]
+rfd = "0.14"
+stable-diffusion.workspace = true
 stable-diffusion-trainer.workspace = true
-clap = { version = "4", features = ["derive"] }
-rfd = "0.13"
+anyhow.workspace = true
+image.workspace = true
+clap.workspace = true
+candle.workspace = true
