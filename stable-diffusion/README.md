@@ -7,7 +7,7 @@ This is the Stable Diffusion core library.
 ## Supported Versions
 
 * Stable Diffusion 1.5
-* Stable Diffusion 2.0
+* Stable Diffusion 2.1
 * Stable Diffusion XL
 * Stable Diffusion Turbo
 

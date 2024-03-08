@@ -6,7 +6,7 @@ Welcome to the official codebase for the Sensorial System's Stable Diffusion pro
 
 ## Features
 
-- **Inference**: Stable Diffusion 1.5, 2.0, XL and Turbo inferences.
+- **Inference**: Stable Diffusion 1.5, 2.1, XL and Turbo inferences.
 - **Training**: Stable Diffusion XL LoRA training.
 
 ## Sub-projects
