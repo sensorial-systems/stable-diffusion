@@ -21,7 +21,6 @@ use candle::{Device, Tensor, D};
 
 /// The `StableDiffusionParameters` struct is used to specify the parameters of the Stable Diffusion model.
 pub struct StableDiffusionParameters {
-    version: StableDiffusionVersion,
     weights: StableDiffusionWeights,
     dtype: DType,
     config: StableDiffusionConfig,
@@ -30,19 +29,20 @@ pub struct StableDiffusionParameters {
 
 impl StableDiffusionParameters {
     /// Create a new `StableDiffusionParameters` instance.
-    pub fn new(version: StableDiffusionVersion, weights: StableDiffusionWeights, device: Device, dtype: DType) -> anyhow::Result<Self> {
-        let config = match version {
+    pub fn new(weights: StableDiffusionWeights, device: Device, dtype: DType) -> anyhow::Result<Self> {
+        let config = match weights.version {
             StableDiffusionVersion::V1_5 => stable_diffusion::StableDiffusionConfig::v1_5(None, None, None),
             StableDiffusionVersion::V2_1 => stable_diffusion::StableDiffusionConfig::v2_1(None, None, None),
             StableDiffusionVersion::XL => stable_diffusion::StableDiffusionConfig::sdxl(None, None, None),
             StableDiffusionVersion::Turbo => stable_diffusion::StableDiffusionConfig::sdxl_turbo(None, None, None),
         };
-        Ok(Self { device, version, weights, dtype, config })
+        Ok(Self { device, weights, dtype, config })
     }
 }
 
 /// The `StableDiffusionWeights` struct is used to specify the weights of the Stable Diffusion model.
 pub struct StableDiffusionWeights {
+    pub version: StableDiffusionVersion,
     pub dtype: DType,
     pub unet: UNetWeights,
     pub vae: VAEWeights,
@@ -63,7 +63,7 @@ impl StableDiffusionWeights {
         let vae = VAEWeights::from_repository(&repository, version, dtype);
         let clip = CLIPWeights::from_repository(&repository, version, dtype);
         let tokenizer = TokenizerWeights::from_repository(version);
-        Self { dtype, unet, vae, clip, tokenizer }
+        Self { version, dtype, unet, vae, clip, tokenizer }
     }
 
     /// Sets the weights of the UNet model.
@@ -123,8 +123,8 @@ impl From<String> for GenerationParameters {
 
 impl GenerationParameters {
     /// Create a new `GenerationParameters` instance from a prompt.
-    pub fn new(prompt: String) -> Self {
-        let prompt = prompt;
+    pub fn new(prompt: impl Into<String>) -> Self {
+        let prompt = prompt.into();
         let uncond_prompt = Default::default();
         let width = Default::default();
         let height = Default::default();
@@ -189,8 +189,8 @@ impl StableDiffusion {
         let device = parameters.device;
         let config = parameters.config;
         let dtype = parameters.dtype;
+        let version = parameters.weights.version;
         let weights = parameters.weights;
-        let version = parameters.version;
 
         println!("Building the unet.");
         let unet = UNet::new(weights.unet.file.fetch()?, &config, &device, dtype)?;
@@ -357,7 +357,7 @@ impl StableDiffusion {
 }
 
 /// The `StableDiffusion` struct is used to specify the Stable Diffusion model.
-#[derive(Debug, Clone, Copy, clap::ValueEnum, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum StableDiffusionVersion {
     V1_5,
     V2_1,

@@ -35,7 +35,6 @@ intel-mkl-src = { workspace = true, optional = true }
 safetensors = { workspace = true }
 tokenizers = { workspace = true, features = ["onig"] }
 anyhow = { workspace = true }
-clap = { workspace = true }
 imageproc = { workspace = true }
 rand = { workspace = true }
 

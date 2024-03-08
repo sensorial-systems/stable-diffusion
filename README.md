@@ -28,7 +28,7 @@ use stable_diffusion::*;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let device = Device::new_cuda(0)?;
     let weights = StableDiffusionWeights::new(StableDiffusionVersion::XL, DType::F32);
-    let parameters = StableDiffusionParameters::new(StableDiffusionVersion::XL, weights, device, DType::BF16)?;
+    let parameters = StableDiffusionParameters::new(weights, device, DType::BF16)?;
     let stable_diffusion = StableDiffusion::new(parameters)?;
     let args = GenerationParameters::new("A green apple");
     let image = stable_diffusion.generate(args)?;
