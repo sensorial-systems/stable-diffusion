@@ -1,5 +1,5 @@
 [workspace.package]
-version = "0.1.8"
+version = "0.1.9"
 description = "Stable Diffusion"
 license = "Apache-2.0"
 documentation = "https://docs.rs/stable-diffusion-trainer"
@@ -10,8 +10,8 @@ authors = ["Danilo Guanabara <danilo@sensorial.systems>"]
 keywords = ["stable-diffusion", "generative-ai", "trainer"]
 
 [workspace.dependencies]
-stable-diffusion = "0.1.8"
-stable-diffusion-trainer = "0.1.8"
+stable-diffusion = "0.1.9"
+stable-diffusion-trainer = "0.1.9"
 
 anyhow = { version = "1", features = ["backtrace"] }
 candle = { package = "candle-core", version = "0.4.1" }
@@ -33,8 +33,8 @@ safetensors = "0.4.1"
 tokenizers = { version = "0.15.0", default-features = false }
 
 [patch.crates-io]
-# stable-diffusion = { path = "stable-diffusion"}
-# stable-diffusion-trainer = { path = "stable-diffusion-trainer"}
+stable-diffusion = { path = "stable-diffusion"}
+stable-diffusion-trainer = { path = "stable-diffusion-trainer"}
 
 
 [workspace]

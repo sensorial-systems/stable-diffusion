@@ -121,13 +121,34 @@ fn view(output: &str) -> anyhow::Result<()> {
     Ok(())
 }
 
+/// The `StableDiffusion` struct is used to specify the Stable Diffusion model.
+#[derive(Debug, Clone, clap::ValueEnum, Copy, PartialEq, Eq)]
+pub enum StableDiffusionVersion {
+    V1_5,
+    V2_1,
+    XL,
+    Turbo,
+}
+
+impl From<StableDiffusionVersion> for stable_diffusion::StableDiffusionVersion {
+    fn from(version: StableDiffusionVersion) -> Self {
+        match version {
+            StableDiffusionVersion::V1_5 => stable_diffusion::StableDiffusionVersion::V1_5,
+            StableDiffusionVersion::V2_1 => stable_diffusion::StableDiffusionVersion::V2_1,
+            StableDiffusionVersion::XL => stable_diffusion::StableDiffusionVersion::XL,
+            StableDiffusionVersion::Turbo => stable_diffusion::StableDiffusionVersion::Turbo,
+        }
+    }
+
+}
+
 impl Arguments {
     pub fn execute(self) -> anyhow::Result<()> {
         let args = self;
         let device = device(args.cpu)?;
         let output = args.output.as_ref().map(String::from).unwrap_or(String::from("output.png"));
-        let weights = StableDiffusionWeights::from_repository(args.sd_version, args.repository, DType::F32);
-        let parameters = StableDiffusionParameters::new(args.sd_version, weights, device, DType::BF16)?;
+        let weights = StableDiffusionWeights::from_repository(args.sd_version.into(), args.repository, DType::F32);
+        let parameters = StableDiffusionParameters::new(weights, device, DType::F16)?;
         let stable_diffusion = StableDiffusion::new(parameters)?;
         let args = GenerationParameters::new(args.prompt.clone())
             .with_width(args.width)

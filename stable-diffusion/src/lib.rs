@@ -21,10 +21,10 @@ use candle::{Device, Tensor, D};
 
 /// The `StableDiffusionParameters` struct is used to specify the parameters of the Stable Diffusion model.
 pub struct StableDiffusionParameters {
-    weights: StableDiffusionWeights,
-    dtype: DType,
-    config: StableDiffusionConfig,
-    device: Device
+    pub weights: StableDiffusionWeights,
+    pub dtype: DType,
+    pub config: StableDiffusionConfig,
+    pub device: Device
 }
 
 impl StableDiffusionParameters {
@@ -286,7 +286,7 @@ impl StableDiffusion {
                 self.dtype
             )?);
         }
-    
+
         let text_embeddings = Tensor::cat(&text_embeddings, D::Minus1)?;
         println!("{text_embeddings:?}");
     
