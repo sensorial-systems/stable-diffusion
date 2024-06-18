@@ -178,9 +178,16 @@ impl Trainer {
         .expect("Failed to execute command");
         for txt in image_dir.read_dir().unwrap() {
             let txt = txt.unwrap().path();
-            if txt.extension().unwrap() == "txt" {
-                let content = format!("{} {} {}", parameters.prompt.instance, parameters.prompt.class, std::fs::read_to_string(&txt).unwrap());
-                std::fs::write(txt, content).expect("Failed to update txt file");
+            match txt.extension() {
+                Some(extension) => {
+                    if extension == "txt" {
+                        let content = format!("{} {} {}", parameters.prompt.instance, parameters.prompt.class, std::fs::read_to_string(&txt).unwrap());
+                        std::fs::write(txt, content).expect("Failed to update txt file");        
+                    }
+                },
+                None => {
+                    println!("Failed to get extension of: {}", txt.display())
+                }
             }
         }
     }
