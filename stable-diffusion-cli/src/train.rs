@@ -45,9 +45,12 @@ impl Setup {
 
 #[derive(Args, Debug, Clone)]
 pub struct Arguments {
-    /// Path to the training config JSON file.
+    /// Path to the training workflow JSON file.
     #[arg(short, long)]
-    config: Option<PathBuf>,
+    workflow: Option<PathBuf>,
+
+    #[arg(short, long)]
+    prepare: bool,
 
     #[command(subcommand)]
     setup: Option<Setup>
@@ -58,8 +61,8 @@ impl Arguments {
         if let Some(mut setup) = self.setup {
             setup.setup();
         } else {
-            let config = self.config.as_ref().ok_or_else(|| anyhow::anyhow!("No config file provided."))?;
-            let parameters = Parameters::from_file(config)?;
+            let config = self.workflow.as_ref().ok_or_else(|| anyhow::anyhow!("No config file provided."))?;
+            let parameters = Workflow::from_file(config)?;
             Trainer::new().start(&parameters);
         }
         Ok(())

@@ -8,7 +8,7 @@ fn main() {
     let image_data_set = ImageDataSet::from_dir("examples/training/lora/bacana/images");
     let data_set = TrainingDataSet::new(image_data_set);
     let output = Output::new("{prompt.instance}({prompt.class})d{network.dimension}a{network.alpha}", "examples/training/lora/bacana/output");
-    let parameters = Parameters::new(prompt, data_set, output);
+    let parameters = Workflow::new(prompt, data_set, output);
 
     Trainer::new()
         .with_environment(environment)

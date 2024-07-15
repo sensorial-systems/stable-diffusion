@@ -24,3 +24,9 @@ impl ImageDataSet {
         &self.0
     }
 }
+
+impl From<String> for ImageDataSet {
+    fn from(path: String) -> Self {
+        ImageDataSet(PathBuf::from(path))
+    }
+}

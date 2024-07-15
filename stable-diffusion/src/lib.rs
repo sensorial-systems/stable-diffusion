@@ -6,7 +6,9 @@ mod clip;
 mod tokenizer;
 mod unet;
 mod file;
+mod device;
 
+pub use device::*;
 pub use vae::*;
 pub use tokenizer::*;
 pub use clip::*;
@@ -17,7 +19,7 @@ pub use file::*;
 use candle_transformers::models::stable_diffusion::{self, StableDiffusionConfig};
 
 pub use anyhow::{Error, Result};
-use candle::{Device, Tensor, D};
+use candle::{Tensor, D};
 
 /// The `StableDiffusionParameters` struct is used to specify the parameters of the Stable Diffusion model.
 pub struct StableDiffusionParameters {
