@@ -3,10 +3,10 @@
 pub mod image_data_set;
 pub use image_data_set::*;
 
-use crate::prelude::*;
+use crate::{prelude::*, utils::Update};
 
 /// A training data set.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct TrainingDataSet {
     /// The training images.
     pub training: ImageDataSet,
@@ -25,5 +25,12 @@ impl TrainingDataSet {
     pub fn with_regularization_images(mut self, regularization_images: ImageDataSet) -> Self {
         self.regularization = Some(regularization_images);
         self
+    }
+}
+
+impl Update for TrainingDataSet {
+    fn update(&mut self, base: Self) {
+        self.training.update(base.training);
+        self.regularization.update(base.regularization);
     }
 }

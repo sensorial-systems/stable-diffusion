@@ -14,7 +14,7 @@ pub use output::*;
 pub use optimizer::*;
 pub use scheduler::*;
 
-use crate::prelude::*;
+use crate::{prelude::*, utils::Update};
 
 fn default_pretrained_model() -> String { "stabilityai/stable-diffusion-xl-base-1.0".to_string() }
 fn default_batch_size() -> usize { 1 }
@@ -76,5 +76,16 @@ impl Training {
     pub fn with_learning_rate(mut self, learning_rate: LearningRate) -> Self {
         self.learning_rate = learning_rate;
         self
+    }
+}
+
+impl Update for Training {
+    fn update(&mut self, _base: Self) {
+        // self.prompt.update(base.prompt);
+        // self.output.update(base.output);
+        // self.optimizer.update(base.optimizer);
+        // self.learning_rate.update(base.learning_rate);
+        // self.network.update(base.network);
+        // self.bucketing.update(base.bucketing);
     }
 }

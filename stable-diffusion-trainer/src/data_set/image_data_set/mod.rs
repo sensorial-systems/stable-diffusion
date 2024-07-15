@@ -1,10 +1,10 @@
 //! ImageDataSet is a simple struct that holds the path to a directory containing images. It is used to represent a dataset of images that can be used for training a model.
 
-use crate::prelude::*;
+use crate::{prelude::*, utils::Update};
 use std::path::{Path, PathBuf};
 
 /// A data set of images.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct ImageDataSet(PathBuf);
 
 impl ImageDataSet {
@@ -28,5 +28,13 @@ impl ImageDataSet {
 impl From<String> for ImageDataSet {
     fn from(path: String) -> Self {
         ImageDataSet(PathBuf::from(path))
+    }
+}
+
+impl Update for ImageDataSet {
+    fn update(&mut self, base: Self) {
+        if base.path().exists() {
+            self.0 = base.0;
+        }
     }
 }
