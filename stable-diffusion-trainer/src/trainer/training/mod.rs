@@ -7,6 +7,8 @@ pub mod bucketing;
 pub mod network;
 pub mod prompt;
 
+use std::collections::HashMap;
+
 pub use network::*;
 pub use prompt::*;
 pub use bucketing::*;
@@ -14,10 +16,10 @@ pub use output::*;
 pub use optimizer::*;
 pub use scheduler::*;
 
-use crate::{prelude::*, utils::Update};
+use crate::{prelude::*, utils::{ReferenceResolver, Update, Variable}};
 
 fn default_pretrained_model() -> String { "stabilityai/stable-diffusion-xl-base-1.0".to_string() }
-fn default_batch_size() -> usize { 1 }
+fn default_batch_size() -> Variable<usize> { 1.into() }
 
 /// The training configuration for the training process.
 #[derive(Debug, Serialize, Deserialize)]
@@ -28,12 +30,12 @@ pub struct Training {
     pub output: Output,
     /// The batch size to use for the training process.
     #[serde(default = "default_batch_size")]
-    pub batch_size: usize,
+    pub batch_size: Variable<usize>,
     /// The name or path of the pretrained model to use for the training process.
     #[serde(default = "default_pretrained_model")]
     pub pretrained_model: String,
     /// The optimizer to use for the training process.
-    pub optimizer: Optimizer,
+    pub optimizer: Variable<Optimizer>,
     /// The learning rate to use for the training process.
     pub learning_rate: LearningRate,
     /// The network to use for the training process.
@@ -45,8 +47,8 @@ pub struct Training {
 impl Training {
     /// Create a new training configuration.
     pub fn new(prompt: Prompt, output: Output) -> Self {
-        let optimizer = Optimizer::Adafactor;
-        let learning_rate = LearningRate::default();
+        let optimizer = Default::default();
+        let learning_rate = Default::default();
         let pretrained_model = default_pretrained_model();
         let batch_size = default_batch_size();
         let network = Default::default();
@@ -68,15 +70,27 @@ impl Training {
 
     /// Set the optimizer for the training process.
     pub fn with_optimizer(mut self, optimizer: Optimizer) -> Self {
-        self.optimizer = optimizer;
+        self.optimizer = optimizer.into();
         self
     }
 
     /// Set the learning rate for the training process.
     pub fn with_learning_rate(mut self, learning_rate: LearningRate) -> Self {
-        self.learning_rate = learning_rate;
+        self.learning_rate = learning_rate.into();
         self
     }
+}
+
+impl ReferenceResolver for Training {
+    fn resolve_references(&mut self, variables: &HashMap<String, serde_json::Value>) {
+        self.prompt.resolve_references(variables);
+        self.output.resolve_references(variables);
+        self.optimizer.resolve_references(variables);
+        self.learning_rate.resolve_references(variables);
+        self.network.resolve_references(variables);
+        self.bucketing.resolve_references(variables);
+    }
+
 }
 
 impl Update for Training {

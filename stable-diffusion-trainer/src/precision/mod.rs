@@ -1,6 +1,10 @@
 //! Precision module contains the definition of the precision of the model.
 
+use crate::prelude::*;
+
 /// The precision enumeration.
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(untagged)]
 pub enum FloatPrecision {
     /// 16-bit floating point precision.
     F16,
@@ -8,6 +12,12 @@ pub enum FloatPrecision {
     BF16,
     /// 32-bit floating point precision.
     F32
+}
+
+impl Default for FloatPrecision {
+    fn default() -> Self {
+        FloatPrecision::F16
+    }
 }
 
 impl std::fmt::Display for FloatPrecision {

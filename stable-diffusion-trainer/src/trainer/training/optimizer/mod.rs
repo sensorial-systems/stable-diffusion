@@ -5,6 +5,7 @@ use std::fmt::Display;
 
 /// The optimizer to use for the training process.
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(untagged)]
 pub enum Optimizer {
     /// AdamW optimizer.
     AdamW,
@@ -44,6 +45,12 @@ pub enum Optimizer {
     SGDNesterov,
     /// SGDNesterov 8-bit optimizer.
     SGDNesterov8bit
+}
+
+impl Default for Optimizer {
+    fn default() -> Self {
+        Optimizer::AdamW
+    }
 }
 
 impl Display for Optimizer {

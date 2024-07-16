@@ -62,8 +62,9 @@ impl Arguments {
             setup.setup();
         } else {
             let config = self.workflow.as_ref().ok_or_else(|| anyhow::anyhow!("No config file provided."))?;
-            let parameters = Workflow::from_file(config)?;
-            Trainer::new().start(&parameters);
+            let workflow = Workflow::from_file(config)?;
+            println!("{:#?}", workflow);
+            Trainer::new().start(&workflow);
         }
         Ok(())
     }

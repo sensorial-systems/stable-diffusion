@@ -2,7 +2,7 @@
 
 use std::path::PathBuf;
 
-use crate::prelude::*;
+use crate::{prelude::*, utils::ReferenceResolver};
 
 /// The output structure.
 #[derive(Debug, Serialize, Deserialize)]
@@ -19,5 +19,12 @@ impl Output {
         let name = name.into();
         let directory = directory.into();
         Output { name, directory }
+    }
+}
+
+impl ReferenceResolver for Output {
+    fn resolve_references(&mut self, variables: &std::collections::HashMap<String, serde_json::Value>) {
+        self.name.resolve_references(variables);
+        self.directory.resolve_references(variables);
     }
 }
