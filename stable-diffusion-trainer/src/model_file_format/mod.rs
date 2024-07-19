@@ -1,11 +1,20 @@
 //! Module for model file format enum.
 
+use crate::prelude::*;
+
 use std::fmt::Display;
 
 /// The model file format enumeration.
+#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
 pub enum ModelFileFormat {
     /// The safetensors format.
     Safetensors
+}
+
+impl Default for ModelFileFormat {
+    fn default() -> Self {
+        ModelFileFormat::Safetensors
+    }
 }
 
 impl Display for ModelFileFormat {

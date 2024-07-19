@@ -14,10 +14,18 @@ pub use output::*;
 pub use optimizer::*;
 pub use scheduler::*;
 
-use crate::prelude::*;
+use crate::{prelude::*, FloatPrecision};
 
 fn default_pretrained_model() -> String { "stabilityai/stable-diffusion-xl-base-1.0".to_string() }
 fn default_batch_size() -> usize { 1 }
+fn default_images_repeat() -> usize { 40 }
+fn default_regularization_images_repeat() -> usize { 1 }
+fn default_resolution() -> (usize, usize) { (1024, 1024) }
+fn default_network_module() -> String { "networks.lora".to_string() }
+fn default_max_train_steps() -> usize { 480 }
+fn default_max_grad_norm() -> f32 { 1.0 }
+fn default_max_data_loader_n_workers() -> usize { 0 }
+fn default_noise_offset() -> f32 { 0.0 }
 
 /// The training configuration for the training process.
 #[derive(Debug, Serialize, Deserialize)]
@@ -39,7 +47,34 @@ pub struct Training {
     /// The network to use for the training process.
     pub network: Network,
     /// Bucketing.
-    pub bucketing: Option<Bucketing>
+    pub bucketing: Option<Bucketing>,
+    /// Images repeat.
+    #[serde(default = "default_images_repeat")]
+    pub images_repeat: usize,
+    /// Regularization images repeat.
+    #[serde(default = "default_regularization_images_repeat")]
+    pub regularization_images_repeat: usize,
+    /// Training resolution.
+    #[serde(default = "default_resolution")]
+    pub resolution: (usize, usize),
+    /// Mixed precision.
+    #[serde(default)]
+    pub mixed_precision: FloatPrecision,
+    /// The module to use for the network.
+    #[serde(default = "default_network_module")]
+    pub network_module: String,
+    /// The maximum number of training steps.
+    #[serde(default = "default_max_train_steps")]
+    pub max_train_steps: usize,
+    /// The maximum gradient norm.
+    #[serde(default = "default_max_grad_norm")]
+    pub max_grad_norm: f32,
+    /// The maximum number of data loader workers.
+    #[serde(default = "default_max_data_loader_n_workers")]
+    pub max_data_loader_n_workers: usize,
+    /// The noise offset.
+    #[serde(default = "default_noise_offset")]
+    pub noise_offset: f32,    
 }
 
 impl Training {
@@ -51,7 +86,16 @@ impl Training {
         let batch_size = default_batch_size();
         let network = Default::default();
         let bucketing = Default::default();
-        Training { prompt, optimizer, learning_rate, pretrained_model, batch_size, network, output, bucketing }
+        let images_repeat = default_images_repeat();
+        let regularization_images_repeat = default_regularization_images_repeat();
+        let mixed_precision = Default::default();
+        let network_module = default_network_module();
+        let max_train_steps = default_max_train_steps();
+        let max_grad_norm = default_max_grad_norm();
+        let max_data_loader_n_workers = default_max_data_loader_n_workers();
+        let noise_offset = default_noise_offset();
+        let resolution = default_resolution();
+        Training { prompt, output, batch_size, pretrained_model, optimizer, network, bucketing, images_repeat, regularization_images_repeat, resolution, mixed_precision, network_module,  learning_rate, max_train_steps, max_grad_norm, max_data_loader_n_workers, noise_offset }
     }
 
     /// Set the network configuration to use for the training process.

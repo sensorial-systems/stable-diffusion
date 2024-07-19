@@ -4,7 +4,6 @@ use crate::prelude::*;
 
 /// The precision enumeration.
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(untagged)]
 pub enum FloatPrecision {
     /// 16-bit floating point precision.
     F16,
@@ -21,7 +20,7 @@ impl Default for FloatPrecision {
 }
 
 impl std::fmt::Display for FloatPrecision {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             FloatPrecision::F16 => write!(f, "fp16"),
             FloatPrecision::BF16 => write!(f, "bf16"),
