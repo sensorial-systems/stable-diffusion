@@ -49,8 +49,9 @@ pub struct Arguments {
     #[arg(short, long)]
     workflow: Option<PathBuf>,
 
+    /// With input file.
     #[arg(short, long)]
-    prepare: bool,
+    input: Option<PathBuf>,
 
     #[command(subcommand)]
     setup: Option<Setup>
@@ -62,7 +63,7 @@ impl Arguments {
             setup.setup();
         } else {
             let config = self.workflow.as_ref().ok_or_else(|| anyhow::anyhow!("No config file provided."))?;
-            let workflow = Workflow::from_file(config)?;
+            let workflow = Workflow::from_file(config, self.input)?;
             println!("{:#?}", workflow);
             Trainer::new().start(&workflow);
         }

@@ -3,7 +3,7 @@
 pub mod image_data_set;
 pub use image_data_set::*;
 
-use crate::{prelude::*, utils::{ReferenceResolver, Update}};
+use crate::prelude::*;
 
 /// A training data set.
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -25,19 +25,5 @@ impl TrainingDataSet {
     pub fn with_regularization_images(mut self, regularization_images: ImageDataSet) -> Self {
         self.regularization = Some(regularization_images);
         self
-    }
-}
-
-impl ReferenceResolver for TrainingDataSet {
-    fn resolve_references(&mut self, variables: &std::collections::HashMap<String, serde_json::Value>) {
-        self.training.resolve_references(variables);
-        self.regularization.resolve_references(variables);
-    }
-}
-
-impl Update for TrainingDataSet {
-    fn update(&mut self, base: Self) {
-        self.training.update(base.training);
-        self.regularization.update(base.regularization);
     }
 }

@@ -31,11 +31,11 @@ intel-mkl-src = { version = "0.8.1", features = ["mkl-static-lp64-iomp"] }
 rand = "0.8.5"
 safetensors = "0.4.1"
 tokenizers = { version = "0.15.0", default-features = false }
+json-template = { path = "../json-template" }
 
 [patch.crates-io]
 stable-diffusion = { path = "stable-diffusion"}
-stable-diffusion-trainer = { path = "stable-diffusion-trainer"}
-
+stable-diffusion-trainer = { path = "stable-diffusion-trainer" }
 
 [workspace]
 resolver = "2"

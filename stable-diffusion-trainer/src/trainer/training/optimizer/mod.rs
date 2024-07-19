@@ -5,7 +5,6 @@ use std::fmt::Display;
 
 /// The optimizer to use for the training process.
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(untagged)]
 pub enum Optimizer {
     /// AdamW optimizer.
     AdamW,

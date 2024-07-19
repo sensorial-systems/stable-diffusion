@@ -12,6 +12,7 @@ authors.workspace = true
 keywords.workspace = true
 
 [dependencies]
+json-template.workspace = true
 uuid = { version = "1", features = ["v4"] }
 directories = "5"
 serde = { version = "1", features = ["derive"] }

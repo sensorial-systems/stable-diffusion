@@ -7,8 +7,6 @@ pub mod bucketing;
 pub mod network;
 pub mod prompt;
 
-use std::collections::HashMap;
-
 pub use network::*;
 pub use prompt::*;
 pub use bucketing::*;
@@ -16,10 +14,10 @@ pub use output::*;
 pub use optimizer::*;
 pub use scheduler::*;
 
-use crate::{prelude::*, utils::{ReferenceResolver, Update, Variable}};
+use crate::prelude::*;
 
 fn default_pretrained_model() -> String { "stabilityai/stable-diffusion-xl-base-1.0".to_string() }
-fn default_batch_size() -> Variable<usize> { 1.into() }
+fn default_batch_size() -> usize { 1 }
 
 /// The training configuration for the training process.
 #[derive(Debug, Serialize, Deserialize)]
@@ -30,12 +28,12 @@ pub struct Training {
     pub output: Output,
     /// The batch size to use for the training process.
     #[serde(default = "default_batch_size")]
-    pub batch_size: Variable<usize>,
+    pub batch_size: usize,
     /// The name or path of the pretrained model to use for the training process.
     #[serde(default = "default_pretrained_model")]
     pub pretrained_model: String,
     /// The optimizer to use for the training process.
-    pub optimizer: Variable<Optimizer>,
+    pub optimizer: Optimizer,
     /// The learning rate to use for the training process.
     pub learning_rate: LearningRate,
     /// The network to use for the training process.
@@ -78,28 +76,5 @@ impl Training {
     pub fn with_learning_rate(mut self, learning_rate: LearningRate) -> Self {
         self.learning_rate = learning_rate.into();
         self
-    }
-}
-
-impl ReferenceResolver for Training {
-    fn resolve_references(&mut self, variables: &HashMap<String, serde_json::Value>) {
-        self.prompt.resolve_references(variables);
-        self.output.resolve_references(variables);
-        self.optimizer.resolve_references(variables);
-        self.learning_rate.resolve_references(variables);
-        self.network.resolve_references(variables);
-        self.bucketing.resolve_references(variables);
-    }
-
-}
-
-impl Update for Training {
-    fn update(&mut self, _base: Self) {
-        // self.prompt.update(base.prompt);
-        // self.output.update(base.output);
-        // self.optimizer.update(base.optimizer);
-        // self.learning_rate.update(base.learning_rate);
-        // self.network.update(base.network);
-        // self.bucketing.update(base.bucketing);
     }
 }

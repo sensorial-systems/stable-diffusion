@@ -9,7 +9,6 @@ pub mod precision;
 pub mod model_file_format;
 pub mod environment;
 pub mod captioning;
-pub mod utils;
 
 pub use data_set::*;
 pub use trainer::*;

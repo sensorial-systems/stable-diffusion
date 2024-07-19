@@ -1,22 +1,16 @@
 //! Trainer's workflow.
 
-use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::prelude::*;
-use crate::utils::{ReferenceResolver, Update};
 use crate::{Captioning, Training, TrainingDataSet};
+use json_template::{Context, Deserializer, JSON};
 use path_slash::*;
+use serde_json::{json, Value};
 
 /// The workflow structure.
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Workflow {
-    /// Base workflows. The current workflow will rewrite the base workflows.
-    #[serde(default)]
-    pub base: Vec<String>,
-    /// Variables.
-    #[serde(default)]
-    pub variables: HashMap<String, serde_json::Value>,
     /// The captioning parameters.
     pub captioning: Option<Captioning>,
     /// The dataset to use for the training process.
@@ -28,27 +22,27 @@ pub struct Workflow {
 
 impl Workflow {
     /// Load workflow from a file.
-    pub fn from_file(path: impl Into<std::path::PathBuf>) -> anyhow::Result<Self> {
+    pub fn from_file(path: impl Into<std::path::PathBuf>, input: Option<std::path::PathBuf>) -> anyhow::Result<Self> {
         let path = path.into().canonicalize()?;
-        let parent = path.parent().unwrap();
-        let file = std::fs::File::open(path.clone())?;
-        let reader = std::io::BufReader::new(file);
-        let mut workflow: Workflow = serde_json::from_reader(reader)?;
+        let parent = path.parent().unwrap().to_path_buf();
 
-        workflow.replace_with_absolute_paths(parent);
-
-        let mut base = Workflow::default();
-        for base_path in workflow.base.iter() {
-            let base_path = std::path::PathBuf::from_slash(parent.to_slash().unwrap()).join(base_path).with_extension("json");
-            let base_workflow = Self::from_file(base_path)?;
-            base.update(base_workflow);
-        }
-        base.update(workflow);
         let time: String = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs().to_string();
-        let time = serde_json::Value::String(time);
-        base.variables.insert("time".to_string(), time);
-        base.resolve_references(&base.variables.clone());
-        Ok(base)
+        let data = serde_json::json!({
+            "input": {
+                "time": time
+            }
+        });
+        let data = input.map(|input| {
+            let input = input.canonicalize().unwrap();
+            let input: Value = Deserializer::new().deserialize(input).unwrap();
+            let mut input = json!({ "input": input });
+            input.add_recursive(data.clone());
+            input
+        }).unwrap_or(data);
+        let context = Context::new().with_data(data);
+        let mut workflow: Workflow = Deserializer::new().deserialize_with_context(path, &context)?;
+        workflow.replace_with_absolute_paths(parent.as_path());
+        Ok(workflow)
     }
 
     fn replace_with_absolute_paths(&mut self, parent: &std::path::Path) {
@@ -66,7 +60,7 @@ impl Workflow {
             if training.output.directory.is_relative() {
                 let path = std::path::PathBuf::from_slash(parent.to_slash().unwrap()).join(training.output.directory.clone());
                 training.output.directory = path;
-            }    
+            }
         }
     }
 
@@ -74,35 +68,12 @@ impl Workflow {
     pub fn new(dataset: TrainingDataSet) -> Self {
         let training = Default::default();
         let captioning = Default::default();
-        let variables = Default::default();
-        let base = Default::default();
-        Workflow { base, variables, captioning, dataset, training }
+        Workflow { captioning, dataset, training }
     }
 
     /// Set the training configuration.
     pub fn with_training(mut self, training: Option<Training>) -> Self {
         self.training = training;
         self
-    }
-}
-
-impl Update for Workflow {
-    fn update(&mut self, base: Self) {
-        self.base.extend(base.base);
-        self.variables.extend(base.variables);
-        self.captioning.update(base.captioning);
-        self.dataset.update(base.dataset);
-        self.training.update(base.training);
-    }
-}
-
-impl ReferenceResolver for Workflow {
-    fn resolve_references(&mut self, variables: &HashMap<String, serde_json::Value>) {
-        for value in &mut self.variables.values_mut() {
-            value.resolve_references(variables);
-        }
-        self.captioning.resolve_references(variables);
-        self.dataset.resolve_references(variables);
-        self.training.resolve_references(variables);
     }
 }

@@ -1,18 +1,18 @@
 //! Learning rate scheduler module.
 
-use crate::{prelude::*, utils::{ReferenceResolver, Variable}};
-use std::{collections::HashMap, fmt::Display};
+use crate::prelude::*;
+use std::fmt::Display;
 
-fn default_amount() -> Variable<f32> { 0.001.into() }
+fn default_amount() -> f32 { 0.001 }
 
 /// The learning rate scheduler structure.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LearningRate {
     /// The amount of the learning rate.
     #[serde(default = "default_amount")]
-    pub amount: Variable<f32>,
+    pub amount: f32,
     /// The learning rate scheduler.
-    pub scheduler: Variable<LearningRateScheduler>
+    pub scheduler: LearningRateScheduler
 }
 
 impl Default for LearningRate {
@@ -39,13 +39,6 @@ impl LearningRate {
     pub fn with_scheduler(mut self, scheduler: LearningRateScheduler) -> Self {
         self.scheduler = scheduler.into();
         self
-    }
-}
-
-impl ReferenceResolver for LearningRate {
-    fn resolve_references(&mut self, variables: &HashMap<String, serde_json::Value>) {
-        self.amount.resolve_references(variables);
-        self.scheduler.resolve_references(variables);
     }
 }
 
