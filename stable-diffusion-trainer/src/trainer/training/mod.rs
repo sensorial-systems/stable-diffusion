@@ -22,7 +22,7 @@ fn default_images_repeat() -> usize { 40 }
 fn default_regularization_images_repeat() -> usize { 1 }
 fn default_resolution() -> (usize, usize) { (1024, 1024) }
 fn default_network_module() -> String { "networks.lora".to_string() }
-fn default_max_train_steps() -> usize { 480 }
+fn default_max_train_steps() -> usize { 1600 }
 fn default_max_grad_norm() -> f32 { 1.0 }
 fn default_max_data_loader_n_workers() -> usize { 0 }
 fn default_noise_offset() -> f32 { 0.0 }

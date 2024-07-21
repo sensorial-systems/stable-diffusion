@@ -153,7 +153,7 @@ impl Trainer {
             .args(["--lr_scheduler", &training.learning_rate.scheduler.to_string()])
             // .args(["--lr_warmup_steps", &self.lr_warmup_steps.to_string()])
             .args(["--train_batch_size", &training.batch_size.to_string()])
-            // .args(["--max_train_steps", &self.max_train_steps.to_string()])
+            .args(["--max_train_steps", &training.max_train_steps.to_string()])
             .args(["--save_every_n_epochs", &training.output.save_every_n_epochs.to_string()])
             .args(["--mixed_precision", &training.mixed_precision.to_string()])
             .args(["--save_precision", &training.output.save_precision.to_string().replace("fp32", "float")])
