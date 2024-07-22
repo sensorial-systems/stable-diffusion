@@ -130,17 +130,19 @@ impl Trainer {
     }
 
     fn train(&self, training: &Training, training_dir: &PathBuf) {
+        let (width, height) = training.resolution.unwrap_or(training.model.resolution());
+        let script = self.environment.kohya_ss().join(training.model.training_script());
         let mut command = Command::new("accelerate");
         let command = command
             .arg("launch")
             .arg("--num_cpu_threads_per_process=8")
-            .arg(self.environment.kohya_ss().join("sdxl_train_network.py"))
+            .arg(script)
             .args(["--train_data_dir", &Self::image_dir(training_dir).display().to_string()])
             .args(["--reg_data_dir", &Self::reg_dir(training_dir).display().to_string()])
             .args(["--output_dir", &training.output.directory.display().to_string()])
             .args(["--output_name", &training.output.name])
-            .args(["--pretrained_model_name_or_path", &training.pretrained_model])
-            .args(["--resolution", &format!("{},{}", training.resolution.0, training.resolution.1)])
+            .args(["--pretrained_model_name_or_path", &training.model.checkpoint().as_str()])
+            .args(["--resolution", &format!("{},{}", width, height)])
             .args(["--save_model_as", &training.output.save_model_as.to_string()])
             .args(["--network_alpha", &training.network.alpha.to_string()])
             .args(["--network_module", &training.network_module])

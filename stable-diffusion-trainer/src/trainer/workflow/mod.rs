@@ -23,6 +23,9 @@ pub struct Workflow {
 impl Workflow {
     /// Load workflow from a file.
     pub fn from_file(path: impl Into<std::path::PathBuf>, input: Option<std::path::PathBuf>) -> anyhow::Result<Self> {
+        let training = crate::Model::default();
+        println!("{}", serde_json::to_string_pretty(&training)?);
+
         let path = path.into().canonicalize()?;
         let parent = path.parent().unwrap().to_path_buf();
 
