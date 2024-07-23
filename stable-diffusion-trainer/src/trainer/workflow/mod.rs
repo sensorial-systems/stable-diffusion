@@ -79,4 +79,10 @@ impl Workflow {
         self.training = training;
         self
     }
+
+    /// Set the captioning configuration.
+    pub fn with_captioning(mut self, captioning: Option<Captioning>) -> Self {
+        self.captioning = captioning;
+        self
+    }
 }
