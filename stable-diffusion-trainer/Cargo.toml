@@ -12,6 +12,7 @@ authors.workspace = true
 keywords.workspace = true
 
 [dependencies]
+rand = "0.8"
 json-template.workspace = true
 uuid = { version = "1", features = ["v4"] }
 directories = "5"

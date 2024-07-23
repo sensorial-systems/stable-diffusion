@@ -5,6 +5,7 @@ use std::{path::PathBuf, process::Command};
 pub mod training;
 pub mod workflow;
 
+use rand::random;
 pub use training::*;
 pub use workflow::*;
 
@@ -137,6 +138,7 @@ impl Trainer {
             .arg("launch")
             .arg("--num_cpu_threads_per_process=8")
             .arg(script)
+            .args(["--seed", &training.seed.unwrap_or_else(|| random()).to_string()])
             .args(["--train_data_dir", &Self::image_dir(training_dir).display().to_string()])
             .args(["--reg_data_dir", &Self::reg_dir(training_dir).display().to_string()])
             .args(["--output_dir", &training.output.directory.display().to_string()])

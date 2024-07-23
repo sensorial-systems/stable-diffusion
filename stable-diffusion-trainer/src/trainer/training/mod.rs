@@ -30,6 +30,8 @@ fn default_noise_offset() -> f32 { 0.0 }
 /// The training configuration for the training process.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Training {
+    /// The seed to use for the training process.
+    pub seed: Option<u32>,
     /// The prompt to use for the training process.
     pub prompt: Prompt,
     /// The output to use for the training process.
@@ -78,6 +80,7 @@ pub struct Training {
 impl Training {
     /// Create a new training configuration.
     pub fn new(prompt: Prompt, output: Output) -> Self {
+        let seed = None;
         let optimizer = Default::default();
         let learning_rate = Default::default();
         let model = Default::default();
@@ -93,7 +96,7 @@ impl Training {
         let max_data_loader_n_workers = default_max_data_loader_n_workers();
         let noise_offset = default_noise_offset();
         let resolution = Default::default();
-        Training { prompt, output, batch_size, model, optimizer, network, bucketing, images_repeat, regularization_images_repeat, resolution, mixed_precision, network_module,  learning_rate, max_train_steps, max_grad_norm, max_data_loader_n_workers, noise_offset }
+        Training { seed, prompt, output, batch_size, model, optimizer, network, bucketing, images_repeat, regularization_images_repeat, resolution, mixed_precision, network_module,  learning_rate, max_train_steps, max_grad_norm, max_data_loader_n_workers, noise_offset }
     }
 
     /// Set the network configuration to use for the training process.
