@@ -2,6 +2,13 @@
 
 **Disclaimer** Stable Diffusion is a trademark owned by Stability AI. Original repos: [Stable Diffusion 1.5](https://github.com/runwayml/stable-diffusion), [Stable Diffusion 2.1](https://github.com/Stability-AI/stablediffusion), [Stable Diffusion XL and XL-Turbo](https://github.com/Stability-AI/stablediffusion)
 
+# Supported
+
+|                      | Checkpoint | LoRA | ControlNet |
+|----------------------|------------|------|------------|
+| Stable Diffusion 1.5 | Yes        | Yes  | No         |
+| Stable Diffusion XL  | Yes        | Yes  | No         |
+
 # Stable Diffusion XL LoRA Trainer
 
 Welcome to the official codebase for the Sensorial System's Stable Diffusion projects. For now, this only hosts the codebase for our Stable Diffusion XL LoRA Trainer, designed to make it easier to automate all the steps of finetuning Stable Diffusion models.

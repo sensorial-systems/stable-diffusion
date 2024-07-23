@@ -132,9 +132,9 @@ impl Trainer {
 
     fn train(&self, training: &Training, training_dir: &PathBuf) {
         let (width, height) = training.resolution.unwrap_or(training.model.resolution());
-        let script = self.environment.kohya_ss().join(training.model.training_script());
+        let script = self.environment.kohya_ss().join(training.model.training_script(&training));
         let mut command = Command::new("accelerate");
-        let command = command
+        command
             .arg("launch")
             .arg("--num_cpu_threads_per_process=8")
             .arg(script)
@@ -146,16 +146,10 @@ impl Trainer {
             .args(["--pretrained_model_name_or_path", &training.model.checkpoint().as_str()])
             .args(["--resolution", &format!("{},{}", width, height)])
             .args(["--save_model_as", &training.output.save_model_as.to_string()])
-            .args(["--network_alpha", &training.network.alpha.to_string()])
-            .args(["--network_module", &training.network_module])
-            .args(["--network_dim", &training.network.dimension.to_string()])
-            .args(["--text_encoder_lr", &training.learning_rate.text_encoder.to_string()])
-            .args(["--unet_lr", &training.learning_rate.unet.to_string()])
             .args(["--lr_scheduler_num_cycles", &training.learning_rate.scheduler_num_cycles.to_string()])
             .arg("--no_half_vae")
             .args(["--learning_rate", &training.learning_rate.amount.to_string()])
             .args(["--lr_scheduler", &training.learning_rate.scheduler.to_string()])
-            // .args(["--lr_warmup_steps", &self.lr_warmup_steps.to_string()])
             .args(["--train_batch_size", &training.batch_size.to_string()])
             .args(["--max_train_steps", &training.max_train_steps.to_string()])
             .args(["--save_every_n_epochs", &training.output.save_every_n_epochs.to_string()])
@@ -166,19 +160,14 @@ impl Trainer {
             .args(["--max_data_loader_n_workers", &training.max_data_loader_n_workers.to_string()])
             .args(["--noise_offset", &training.noise_offset.to_string()])
             .arg("--xformers");
+
+    training.target.set_parameters(&mut command, training);
         // Move it to Adafactor
             // .args(["--optimizer_args", "scale_parameter=False", "relative_step=False", "warmup_init=False"])
 
-    let command = if let Some(bucketing) = &training.bucketing {
-        command
-            .arg("--enable_bucket")
-            // .arg("--bucket_no_upscale")
-            .args(["--min_bucket_reso", &bucketing.min_resolution.to_string()])
-            .args(["--max_bucket_reso", &bucketing.max_resolution.to_string()])
-            .args(["--bucket_reso_steps", &bucketing.resolution_steps.to_string()])
-    } else {
-        command
-    };
+    if let Some(bucketing) = &training.bucketing {
+        bucketing.set_parameters(&mut command);
+    }
     command
         .status()
         .expect("Failed to execute command");

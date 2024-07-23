@@ -1,7 +1,7 @@
 //! Model module.
 
 pub mod checkpoint;
-use crate::prelude::*;
+use crate::{prelude::*, Target, Training};
 pub use checkpoint::*;
 
 /// The Model structure.
@@ -42,10 +42,13 @@ impl Model {
     }
 
     /// Get the training script of the model.
-    pub fn training_script(&self) -> &str {
-        match self {
-            Self::StableDiffusion1_5(_) => "train_network.py",
-            Self::StableDiffusionXL(_) => "sdxl_train_network.py"
+    pub fn training_script(&self, training: &Training) -> &str {
+        match (self, &training.target) {
+            (Self::StableDiffusion1_5(_), Target::LoRA(_)) => "train_network.py",
+            (Self::StableDiffusion1_5(_), Target::Checkpoint) => "train_db.py",
+            (Self::StableDiffusionXL(_), Target::LoRA(_)) => "sdxl_train_network.py",
+            (Self::StableDiffusionXL(_), Target::Checkpoint) => "sdxl_train.py",
+            _ => todo!("Training script not implemented for the model and target.")
         }
     }
 }
