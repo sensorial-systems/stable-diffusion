@@ -23,3 +23,8 @@ anyhow.workspace = true
 image.workspace = true
 clap.workspace = true
 candle.workspace = true
+
+[features]
+cuda = ["stable-diffusion/cuda"]
+metal = ["stable-diffusion/metal"]
+mkl = ["stable-diffusion/mkl"]
