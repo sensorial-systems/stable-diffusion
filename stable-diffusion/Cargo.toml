@@ -12,7 +12,6 @@ authors.workspace = true
 keywords.workspace = true
 
 [features]
-default = ["cuda"]
 cuda = ["candle/cuda", "candle-nn/cuda", "candle-transformers/cuda", "dep:bindgen_cuda"]
 cudnn = ["candle/cudnn"]
 flash-attn = ["cuda", "candle-transformers/flash-attn", "dep:candle-flash-attn"]
