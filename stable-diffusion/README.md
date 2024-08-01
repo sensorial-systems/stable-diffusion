@@ -15,10 +15,10 @@ This is the Stable Diffusion core library.
 
 ## Backends
 
-* Cuda (default rust-feature)
+* CPU (default)
+* MKL
+* Cuda 
 * Metal
-* Onnx
-* CPU
 
 ## Examples
 
