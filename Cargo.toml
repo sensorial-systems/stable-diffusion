@@ -31,7 +31,7 @@ intel-mkl-src = { version = "0.8.1", features = ["mkl-static-lp64-iomp"] }
 rand = "0.8.5"
 safetensors = "0.4.1"
 tokenizers = { version = "0.15.0", default-features = false }
-json-template = { path = "../json-template" }
+json-template = "0.9.5"
 
 [patch.crates-io]
 stable-diffusion = { path = "stable-diffusion"}
