@@ -17,14 +17,7 @@ path = "src/main.rs"
 
 [dependencies]
 rfd = "0.14"
-stable-diffusion.workspace = true
 stable-diffusion-trainer.workspace = true
 anyhow.workspace = true
 image.workspace = true
 clap.workspace = true
-candle.workspace = true
-
-[features]
-cuda = ["stable-diffusion/cuda"]
-metal = ["stable-diffusion/metal"]
-mkl = ["stable-diffusion/mkl"]

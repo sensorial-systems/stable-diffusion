@@ -10,7 +10,6 @@ authors = ["Danilo Guanabara <danilo@sensorial.systems>"]
 keywords = ["stable-diffusion", "generative-ai", "trainer"]
 
 [workspace.dependencies]
-stable-diffusion = "0.1.9"
 stable-diffusion-trainer = "0.1.9"
 
 anyhow = { version = "1", features = ["backtrace"] }
@@ -40,7 +39,7 @@ stable-diffusion-trainer = { path = "stable-diffusion-trainer" }
 [workspace]
 resolver = "2"
 members = [
-    "stable-diffusion",
+    # "stable-diffusion",
     "stable-diffusion-trainer",
     "stable-diffusion-cli",
     "examples/generation"

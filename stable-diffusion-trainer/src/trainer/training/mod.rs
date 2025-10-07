@@ -27,6 +27,7 @@ fn default_max_train_steps() -> usize { 1600 }
 fn default_max_grad_norm() -> f32 { 1.0 }
 fn default_max_data_loader_n_workers() -> usize { 0 }
 fn default_noise_offset() -> f32 { 0.0 }
+fn default_gradient_accumulation_steps() -> usize { 8 }
 
 /// The training configuration for the training process.
 #[derive(Debug, Serialize, Deserialize)]
@@ -74,6 +75,9 @@ pub struct Training {
     /// The noise offset.
     #[serde(default = "default_noise_offset")]
     pub noise_offset: f32,    
+    /// The gradient accumulation steps.
+    #[serde(default = "default_gradient_accumulation_steps")]
+    pub gradient_accumulation_steps: usize,
 }
 
 impl Training {
@@ -92,9 +96,10 @@ impl Training {
         let max_grad_norm = default_max_grad_norm();
         let max_data_loader_n_workers = default_max_data_loader_n_workers();
         let noise_offset = default_noise_offset();
+        let gradient_accumulation_steps = default_gradient_accumulation_steps();
         let resolution = Default::default();
         let target = Default::default();
-        Training { target, seed, prompt, output, batch_size, model, optimizer, bucketing, images_repeat, regularization_images_repeat, resolution, mixed_precision, learning_rate, max_train_steps, max_grad_norm, max_data_loader_n_workers, noise_offset }
+        Training { target, seed, prompt, output, batch_size, model, optimizer, bucketing, images_repeat, regularization_images_repeat, resolution, mixed_precision, learning_rate, max_train_steps, max_grad_norm, max_data_loader_n_workers, noise_offset, gradient_accumulation_steps }
     }
 
     /// Set the model for the training process.

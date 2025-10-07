@@ -60,12 +60,17 @@ impl Environment {
         &self.kohya_ss
     }
 
+    /// Get the sd-scripts path.
+    pub fn sd_scripts(&self) -> PathBuf {
+        self.kohya_ss.join("sd-scripts")
+    }
+
     /// Get the kohya_ss path.
     pub fn binary_path(&self) -> PathBuf {
         #[cfg(target_os = "windows")]
-        let python_executable = self.kohya_ss.join("venv").join("Scripts");
+        let python_executable = self.kohya_ss.join(".venv").join("Scripts");
         #[cfg(not(target_os = "windows"))]
-        let python_executable = self.kohya_ss.join("venv").join("bin");
+        let python_executable = self.kohya_ss.join(".venv").join("bin");
         python_executable
     }
 
@@ -80,7 +85,7 @@ impl Environment {
 
     /// Activate the environment.
     pub fn activate(&mut self) {
-        std::env::set_var("PYTHONPATH", self.kohya_ss.join("venv").join("Lib").join("site-packages"));
+        std::env::set_var("PYTHONPATH", self.kohya_ss.join(".venv").join("Lib").join("site-packages"));
         #[cfg(target_os = "windows")]
         std::env::set_var("PATH", format!("{};{}", self.binary_path().display(), std::env::var("PATH").unwrap()));
         #[cfg(not(target_os = "windows"))]

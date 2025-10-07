@@ -100,8 +100,9 @@ impl Trainer {
     fn caption(&self, parameters: &Workflow, captioning: &Captioning) {
         let image_dir = parameters.dataset.training.path();
         let python_executable = self.environment.python_executable_path();
+        std::env::set_current_dir(&self.environment.sd_scripts()).expect("Failed to set current directory");
         Command::new(python_executable)
-            .arg(self.environment.kohya_ss().join("finetune").join("make_captions.py"))
+            .arg(self.environment.sd_scripts().join("finetune").join("make_captions.py"))
             .args(["--batch_size", &captioning.batch_size.to_string()])
             .args(["--num_beams", &captioning.num_beams.to_string()])
             .args(["--top_p", &captioning.top_p.to_string()])
@@ -113,7 +114,7 @@ impl Trainer {
             .args(["--caption_weights", "https://storage.googleapis.com/sfr-vision-language-research/BLIP/models/model_large_caption.pth"])
             .status()
             .expect("Failed to execute command");    
-        for txt in image_dir.read_dir().unwrap() {
+        for txt in image_dir.read_dir().expect(format!("Failed to read directory: {}", image_dir.display()).as_str()) {
             let txt = txt.unwrap().path();
             match txt.extension() {
                 Some(extension) => {
@@ -132,11 +133,12 @@ impl Trainer {
 
     fn train(&self, training: &Training, training_dir: &PathBuf) {
         let (width, height) = training.resolution.unwrap_or(training.model.resolution());
-        let script = self.environment.kohya_ss().join(training.model.training_script(&training));
+        let script = self.environment.sd_scripts().join(training.model.training_script(&training));
         let mut command = Command::new("accelerate");
         command
             .arg("launch")
-            .arg("--num_cpu_threads_per_process=8")
+            .args(["--gpu_ids","1"])
+            // .arg("--num_cpu_threads_per_process=16")
             .arg(script)
             .args(["--seed", &training.seed.unwrap_or_else(|| random()).to_string()])
             .args(["--train_data_dir", &Self::image_dir(training_dir).display().to_string()])
@@ -147,7 +149,7 @@ impl Trainer {
             .args(["--resolution", &format!("{},{}", width, height)])
             .args(["--save_model_as", &training.output.save_model_as.to_string()])
             .args(["--lr_scheduler_num_cycles", &training.learning_rate.scheduler_num_cycles.to_string()])
-            .arg("--no_half_vae")
+            // .arg("--no_half_vae")
             .args(["--learning_rate", &training.learning_rate.amount.to_string()])
             .args(["--lr_scheduler", &training.learning_rate.scheduler.to_string()])
             .args(["--train_batch_size", &training.batch_size.to_string()])
@@ -157,8 +159,9 @@ impl Trainer {
             .args(["--save_precision", &training.output.save_precision.to_string().replace("fp32", "float")])
             .args(["--optimizer_type", &training.optimizer.to_string()])
             .args(["--max_grad_norm", &training.max_grad_norm.to_string()])
-            .args(["--max_data_loader_n_workers", &training.max_data_loader_n_workers.to_string()])
+            // .args(["--max_data_loader_n_workers", &training.max_data_loader_n_workers.to_string()])
             .args(["--noise_offset", &training.noise_offset.to_string()])
+            // .arg("--cache_latents")
             .arg("--xformers");
 
     training.target.set_parameters(&mut command, training);
@@ -168,6 +171,9 @@ impl Trainer {
     if let Some(bucketing) = &training.bucketing {
         bucketing.set_parameters(&mut command);
     }
+
+    println!("{:?}", command);
+
     command
         .status()
         .expect("Failed to execute command");

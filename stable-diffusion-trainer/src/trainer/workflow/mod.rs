@@ -36,7 +36,7 @@ impl Workflow {
             }
         });
         let data = input.map(|input| {
-            let input = input.canonicalize().unwrap();
+            let input = input.canonicalize().expect(format!("Failed to canonicalize input file: {}", input.display()).as_str());
             let input: Value = Deserializer::new().deserialize(input).unwrap();
             let mut input = json!({ "input": input });
             input.add_recursive(data.clone());
