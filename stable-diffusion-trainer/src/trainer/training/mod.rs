@@ -21,7 +21,7 @@ pub use target::*;
 use crate::{prelude::*, FloatPrecision};
 
 fn default_batch_size() -> usize { 1 }
-fn default_images_repeat() -> usize { 40 }
+fn default_images_repeat() -> usize { 1 }
 fn default_regularization_images_repeat() -> usize { 1 }
 fn default_max_train_steps() -> usize { 1600 }
 fn default_max_grad_norm() -> f32 { 1.0 }
